@@ -1,90 +1,155 @@
 import streamlit as st
 import numpy as np
 from scipy.stats import poisson
-import pandas as pd
+import matplotlib.pyplot as plt
 
-# Title and Description
-st.title("Realistic Sports Betting Correct Score Predictor")
-st.write("""
-This app predicts correct scores, calculates probabilities for HT/FT outcomes, and provides AI-recommended bets for potential profit.
+# Function to Calculate Poisson Probabilities
+def calculate_poisson_prob(lambda_, max_goals=4):
+    """Calculate Poisson probabilities up to max_goals."""
+    return [poisson.pmf(i, lambda_) for i in range(max_goals + 1)]
+
+# Function to Calculate Bookmaker's Margin
+def calculate_margin(odds_list):
+    """Calculate bookmaker's margin given a list of odds."""
+    return (sum(1 / odds for odds in odds_list) - 1) * 100
+
+# Function to Calculate Expected Value
+def calculate_expected_value(prob, odds):
+    """Calculate expected value."""
+    return (prob * odds) - 1
+
+# App Title and Introduction
+st.title("🤖 Rabiotic Advanced HT/FT Correct Score Predictor")
+st.markdown("""
+Welcome to the **Rabiotic Advanced Halftime/Full-time Correct Score Predictor**!  
+This app uses advanced statistical models, including the Poisson distribution, betting odds, and team statistics, 
+to predict realistic halftime and full-time correct scores for football matches.  
+It is designed to enhance your betting strategies by providing precise calculations for maximum ROI.
 """)
 
-# User Inputs
-st.sidebar.header("Match Statistics")
-home_team = st.sidebar.text_input("Home Team", "Team A")
-away_team = st.sidebar.text_input("Away Team", "Team B")
-avg_home_goals = st.sidebar.number_input("Home Team Avg Goals Scored", min_value=0.0, max_value=5.0, value=1.4, step=0.1)
-avg_away_goals = st.sidebar.number_input("Away Team Avg Goals Scored", min_value=0.0, max_value=5.0, value=1.2, step=0.1)
-odds_home_win = st.sidebar.number_input("Odds for Home Win", min_value=1.0, value=2.5)
-odds_draw = st.sidebar.number_input("Odds for Draw", min_value=1.0, value=3.0)
-odds_away_win = st.sidebar.number_input("Odds for Away Win", min_value=1.0, value=2.8)
+# Sidebar for Inputs
+st.sidebar.header("Match Statistics and Inputs")
 
-# Poisson Distribution
-def poisson_prob(avg_goals, max_goals=5):
-    """Calculate Poisson probabilities for goals."""
-    return [poisson.pmf(i, avg_goals) for i in range(max_goals+1)]
+# Average Goals Scored
+avg_goals_home = st.sidebar.number_input("Average Goals Scored by Home Team", min_value=0.0, step=0.1, value=1.5)
+avg_goals_away = st.sidebar.number_input("Average Goals Scored by Away Team", min_value=0.0, step=0.1, value=1.2)
 
-home_probs = poisson_prob(avg_home_goals)
-away_probs = poisson_prob(avg_away_goals)
+# Average Points
+avg_points_home = st.sidebar.number_input("Average Points for Home Team", min_value=0.0, step=0.1, value=1.8)
+avg_points_away = st.sidebar.number_input("Average Points for Away Team", min_value=0.0, step=0.1, value=1.5)
 
-# Probabilities for Each Scoreline
-scoreline_probs = {}
-for home_goals, p_home in enumerate(home_probs):
-    for away_goals, p_away in enumerate(away_probs):
-        scoreline_probs[(home_goals, away_goals)] = p_home * p_away
+# Betting Odds for HT and FT
+st.sidebar.subheader("Halftime Odds")
+ht_home = st.sidebar.number_input("Halftime Home Odds", min_value=1.0, step=0.1, value=2.5)
+ht_draw = st.sidebar.number_input("Halftime Draw Odds", min_value=1.0, step=0.1, value=2.9)
+ht_away = st.sidebar.number_input("Halftime Away Odds", min_value=1.0, step=0.1, value=3.1)
 
-# DataFrame for Visualization
-df = pd.DataFrame.from_dict(scoreline_probs, orient='index', columns=['Probability'])
-df.index = pd.MultiIndex.from_tuples(df.index, names=["Home Goals", "Away Goals"])
-df = df.sort_values('Probability', ascending=False)
+st.sidebar.subheader("Fulltime Odds")
+ft_home = st.sidebar.number_input("Fulltime Home Odds", min_value=1.0, step=0.1, value=2.2)
+ft_draw = st.sidebar.number_input("Fulltime Draw Odds", min_value=1.0, step=0.1, value=3.2)
+ft_away = st.sidebar.number_input("Fulltime Away Odds", min_value=1.0, step=0.1, value=3.4)
 
-# Display Top Predictions
-st.write("### Top Predicted Correct Scores")
-st.dataframe(df.head(10))
+# Adding Full Listing of HT/FT Odds
+st.sidebar.subheader("All HT/FT Odds")
 
-# HT/FT Predictions
-st.write("### HT/FT Predictions")
-ht_probs = {}
-ft_probs = {}
-for (ht_home, ht_away), prob in scoreline_probs.items():
-    if ht_home + ht_away < 2:  # Simplistic assumption: HT score is within first 2 goals
-        ht_probs[(ht_home, ht_away)] = prob
-    ft_probs[(ht_home, ht_away)] = prob
+# HT/FT Combination Odds
+for home in ["Home", "Draw", "Away"]:
+    for full in ["Home", "Draw", "Away"]:
+        odds_key = f"{home}-{full}"
+        st.sidebar.number_input(f"HT/FT Odds for {home} - {full}", min_value=1.0, step=0.1, value=3.0, key=odds_key)
 
-ht_probs = {k: v / sum(ht_probs.values()) for k, v in ht_probs.items()}
-ft_probs = {k: v / sum(ft_probs.values()) for k, v in ft_probs.items()}
+# Correct Score Odds for HT and FT
+def get_correct_score_odds(prefix, max_goals, half_time=True):
+    """Generate correct score odds inputs for HT or FT."""
+    score_odds = {}
+    for i in range(max_goals):
+        for j in range(max_goals):
+            score = f"{i}:{j}"
+            score_odds[score] = st.sidebar.number_input(f"{prefix} Odds for {score}", value=10.0, step=0.01)
+    score_odds["Other"] = st.sidebar.number_input(f"{prefix} Odds for scores exceeding {max_goals-1}:{max_goals-1}", value=50.0, step=0.01)
+    return score_odds
 
-st.write("#### Top HT Outcomes")
-st.write(pd.Series(ht_probs).sort_values(ascending=False).head(5))
+correct_score_odds_halftime = get_correct_score_odds("HT", 3)
+correct_score_odds_fulltime = get_correct_score_odds("FT", 5, half_time=False)
 
-st.write("#### Top FT Outcomes")
-st.write(pd.Series(ft_probs).sort_values(ascending=False).head(5))
+# Calculate Probabilities for HT/FT based on odds
+def calculate_probabilities(odds_list):
+    """Calculate probabilities based on odds."""
+    return [1 / odds for odds in odds_list]
 
-# BTTS (Both Teams to Score)
-btts_yes = sum(prob for (h, a), prob in scoreline_probs.items() if h > 0 and a > 0)
-btts_no = 1 - btts_yes
+ht_probs = calculate_probabilities([ht_home, ht_draw, ht_away])
+ft_probs = calculate_probabilities([ft_home, ft_draw, ft_away])
 
-st.write("### Both Teams to Score (BTTS) Predictions")
-st.write(f"BTTS - Yes: {btts_yes:.2%}")
-st.write(f"BTTS - No: {btts_no:.2%}")
+# Calculate Margins for HT and FT
+ht_margin = calculate_margin([ht_home, ht_draw, ht_away])
+ft_margin = calculate_margin([ft_home, ft_draw, ft_away])
 
-# AI Bet Recommendation
-st.write("### AI Betting Recommendation")
-best_bet = None
-if odds_home_win < odds_draw and odds_home_win < odds_away_win:
-    best_bet = f"Bet on Home Win ({odds_home_win})"
-elif odds_away_win < odds_draw:
-    best_bet = f"Bet on Away Win ({odds_away_win})"
-else:
-    best_bet = f"Bet on Draw ({odds_draw})"
+# Display HT/FT probabilities and margins
+st.write(f"Halftime Probabilities: {np.round(ht_probs, 3)}")
+st.write(f"Fulltime Probabilities: {np.round(ft_probs, 3)}")
+st.write(f"Halftime Bookmaker Margin: {ht_margin:.2f}%")
+st.write(f"Fulltime Bookmaker Margin: {ft_margin:.2f}%")
 
-if btts_yes > 0.5:
-    st.write(f"Recommended Bet: {best_bet} with BTTS - Yes")
-else:
-    st.write(f"Recommended Bet: {best_bet} with BTTS - No")
+# Halftime/Fulltime Correct Score Recommendation
+def recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime):
+    """Recommend the most probable HT/FT correct score."""
+    best_ht_score = max(ht_probs)
+    best_ft_score = max(ft_probs)
+    
+    ht_recommendation = list(correct_score_odds_halftime.keys())[np.argmax(ht_probs)]
+    ft_recommendation = list(correct_score_odds_fulltime.keys())[np.argmax(ft_probs)]
+    
+    st.subheader("Recommended Correct Score")
+    st.write(f"Most likely HT score: {ht_recommendation} with a probability of {best_ht_score*100:.2f}%")
+    st.write(f"Most likely FT score: {ft_recommendation} with a probability of {best_ft_score*100:.2f}%")
 
-# Footer
-st.write("""
----
-*Powered by statistical modeling and AI.*
-""")
+recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime)
+
+# Exact Goals Odds Calculation (Optional)
+st.sidebar.subheader("Exact Goals Odds (0 to 6+ Goals)")
+exact_goals_odds = {
+    "0 Goals": st.sidebar.number_input("Odds for 0 Goals", min_value=1.0, step=0.1, value=6.0),
+    "1 Goal": st.sidebar.number_input("Odds for 1 Goal", min_value=1.0, step=0.1, value=5.5),
+    "2 Goals": st.sidebar.number_input("Odds for 2 Goals", min_value=1.0, step=0.1, value=4.0),
+    "3 Goals": st.sidebar.number_input("Odds for 3 Goals", min_value=1.0, step=0.1, value=3.0),
+    "4 Goals": st.sidebar.number_input("Odds for 4 Goals", min_value=1.0, step=0.1, value=2.5),
+    "5 Goals": st.sidebar.number_input("Odds for 5 Goals", min_value=1.0, step=0.1, value=15.0),
+    "6+ Goals": st.sidebar.number_input("Odds for 6+ Goals", min_value=1.0, step=0.1, value=30.0)
+}
+
+# Calculate Exact Goal Probabilities
+exact_goal_probs = {}
+total_odds = sum(1 / value for value in exact_goals_odds.values())
+for goal, odds in exact_goals_odds.items():
+    prob = 1 / odds
+    exact_goal_probs[goal] = prob / total_odds * 100
+
+# Display Exact Goal Probabilities
+st.write(f"Exact Goal Probabilities: {exact_goal_probs}")
+
+# Button to predict probabilities and insights
+if st.button("Predict Probabilities and Insights"):
+    try:
+        # Calculate Poisson Probabilities for Fulltime
+        fulltime_home_probs = calculate_poisson_prob(avg_goals_home, max_goals=4)
+        fulltime_away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
+        score_matrix = np.outer(fulltime_home_probs, fulltime_away_probs)
+
+        # Calculate Poisson Probabilities for Halftime (assuming halftime goals are ~50% of fulltime goals)
+        halftime_home_avg = avg_goals_home / 2
+        halftime_away_avg = avg_goals_away / 2
+        halftime_home_probs = calculate_poisson_prob(halftime_home_avg, max_goals=2)
+        halftime_away_probs = calculate_poisson_prob(halftime_away_avg, max_goals=2)
+        halftime_score_matrix = np.outer(halftime_home_probs, halftime_away_probs)
+
+        # Calculate Fulltime Score Probabilities
+        fulltime_score_probs = {f"{i}:{j}": score_matrix[i, j] for i in range(4) for j in range(4)}
+
+        # Display Fulltime Score Probabilities
+        st.write("Fulltime Score Probabilities:")
+        for score, prob in fulltime_score_probs.items():
+            st.write(f"{score}: {prob:.3f}")
+
+        st.write(f"Predicted Fulltime Scores: {fulltime_score_probs}")
+    except Exception as e:
+        st.write(f"Error: {str(e)}")
