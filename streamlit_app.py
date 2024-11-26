@@ -49,14 +49,12 @@ ft_home = st.sidebar.number_input("Fulltime Home Odds", min_value=1.0, step=0.1,
 ft_draw = st.sidebar.number_input("Fulltime Draw Odds", min_value=1.0, step=0.1, value=3.2)
 ft_away = st.sidebar.number_input("Fulltime Away Odds", min_value=1.0, step=0.1, value=3.4)
 
-# Display HT/FT Odds in Sidebar
-st.sidebar.markdown("### Halftime/Full-time Odds")
-st.sidebar.write(f"**Halftime Home Odds:** {ht_home}")
-st.sidebar.write(f"**Halftime Draw Odds:** {ht_draw}")
-st.sidebar.write(f"**Halftime Away Odds:** {ht_away}")
-st.sidebar.write(f"**Fulltime Home Odds:** {ft_home}")
-st.sidebar.write(f"**Fulltime Draw Odds:** {ft_draw}")
-st.sidebar.write(f"**Fulltime Away Odds:** {ft_away}")
+# Display the HT/FT odds in the sidebar for easy reference
+st.sidebar.subheader("Halftime/Full-time Odds Summary")
+st.sidebar.write("### Halftime Odds")
+st.sidebar.write(f"Home: {ht_home} | Draw: {ht_draw} | Away: {ht_away}")
+st.sidebar.write("### Fulltime Odds")
+st.sidebar.write(f"Home: {ft_home} | Draw: {ft_draw} | Away: {ft_away}")
 
 # Correct Score Odds for HT and FT
 def get_correct_score_odds(prefix, max_goals, half_time=True):
@@ -152,9 +150,11 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
-        # Display Fulltime and Halftime Score Probabilities
-        st.write(f"Fulltime Score Probabilities: {fulltime_score_probs}")
-        st.write(f"Halftime Score Probabilities: {halftime_score_probs}")
+        st.subheader("Fulltime Correct Score Probabilities")
+        st.write(fulltime_score_probs)
 
+        st.subheader("Halftime Correct Score Probabilities")
+        st.write(halftime_score_probs)
+    
     except Exception as e:
-        st.error(f"Error predicting: {e}")
+        st.error(f"Error in prediction: {e}")
