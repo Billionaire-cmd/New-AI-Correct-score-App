@@ -49,12 +49,14 @@ ft_home = st.sidebar.number_input("Fulltime Home Odds", min_value=1.0, step=0.1,
 ft_draw = st.sidebar.number_input("Fulltime Draw Odds", min_value=1.0, step=0.1, value=3.2)
 ft_away = st.sidebar.number_input("Fulltime Away Odds", min_value=1.0, step=0.1, value=3.4)
 
-# Display the HT/FT odds in the sidebar for easy reference
-st.sidebar.subheader("Halftime/Full-time Odds Summary")
-st.sidebar.write("### Halftime Odds")
-st.sidebar.write(f"Home: {ht_home} | Draw: {ht_draw} | Away: {ht_away}")
-st.sidebar.write("### Fulltime Odds")
-st.sidebar.write(f"Home: {ft_home} | Draw: {ft_draw} | Away: {ft_away}")
+# Display HT/FT Odds
+st.sidebar.subheader("Halftime/Full-time Odds Overview")
+st.sidebar.write(f"**Halftime Home Odds**: {ht_home}")
+st.sidebar.write(f"**Halftime Draw Odds**: {ht_draw}")
+st.sidebar.write(f"**Halftime Away Odds**: {ht_away}")
+st.sidebar.write(f"**Fulltime Home Odds**: {ft_home}")
+st.sidebar.write(f"**Fulltime Draw Odds**: {ft_draw}")
+st.sidebar.write(f"**Fulltime Away Odds**: {ft_away}")
 
 # Correct Score Odds for HT and FT
 def get_correct_score_odds(prefix, max_goals, half_time=True):
@@ -102,59 +104,3 @@ def recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, cor
     st.write(f"Most likely FT score: {ft_recommendation} with a probability of {best_ft_score*100:.2f}%")
 
 recommend_correct_score(ht_probs, ft_probs, correct_score_odds_halftime, correct_score_odds_fulltime)
-
-# Exact Goals Odds Calculation (Optional)
-st.sidebar.subheader("Exact Goals Odds (0 to 6+ Goals)")
-exact_goals_odds = {
-    "0 Goals": st.sidebar.number_input("Odds for 0 Goals", min_value=1.0, step=0.1, value=6.0),
-    "1 Goal": st.sidebar.number_input("Odds for 1 Goal", min_value=1.0, step=0.1, value=5.5),
-    "2 Goals": st.sidebar.number_input("Odds for 2 Goals", min_value=1.0, step=0.1, value=4.0),
-    "3 Goals": st.sidebar.number_input("Odds for 3 Goals", min_value=1.0, step=0.1, value=3.0),
-    "4 Goals": st.sidebar.number_input("Odds for 4 Goals", min_value=1.0, step=0.1, value=2.5),
-    "5 Goals": st.sidebar.number_input("Odds for 5 Goals", min_value=1.0, step=0.1, value=15.0),
-    "6+ Goals": st.sidebar.number_input("Odds for 6+ Goals", min_value=1.0, step=0.1, value=30.0)
-}
-
-# Calculate Exact Goal Probabilities
-exact_goal_probs = {}
-total_odds = sum(1 / value for value in exact_goals_odds.values())
-for goal, odds in exact_goals_odds.items():
-    prob = 1 / odds
-    exact_goal_probs[goal] = prob / total_odds * 100
-
-# Display Exact Goal Probabilities
-st.write(f"Exact Goal Probabilities: {exact_goal_probs}")
-
-# Button to predict probabilities and insights
-if st.button("Predict Probabilities and Insights"):
-    try:
-        # Calculate Poisson Probabilities for Fulltime
-        fulltime_home_probs = calculate_poisson_prob(avg_goals_home, max_goals=4)
-        fulltime_away_probs = calculate_poisson_prob(avg_goals_away, max_goals=4)
-        score_matrix = np.outer(fulltime_home_probs, fulltime_away_probs)
-
-        # Calculate Poisson Probabilities for Halftime (assuming halftime goals are ~50% of fulltime goals)
-        halftime_home_avg = avg_goals_home / 2
-        halftime_away_avg = avg_goals_away / 2
-        halftime_home_probs = calculate_poisson_prob(halftime_home_avg, max_goals=2)
-        halftime_away_probs = calculate_poisson_prob(halftime_away_avg, max_goals=2)
-        halftime_score_matrix = np.outer(halftime_home_probs, halftime_away_probs)
-
-        # Calculate Fulltime Score Probabilities
-        fulltime_score_probs = {f"{i}:{j}": score_matrix[i, j] for i in range(5) for j in range(5)}
-        fulltime_other_prob = 1 - sum(fulltime_score_probs.values())
-        fulltime_score_probs["Other"] = fulltime_other_prob
-
-        # Calculate Halftime Score Probabilities
-        halftime_score_probs = {f"{i}:{j}": halftime_score_matrix[i, j] for i in range(3) for j in range(3)}
-        halftime_other_prob = 1 - sum(halftime_score_probs.values())
-        halftime_score_probs["Other"] = halftime_other_prob
-
-        st.subheader("Fulltime Correct Score Probabilities")
-        st.write(fulltime_score_probs)
-
-        st.subheader("Halftime Correct Score Probabilities")
-        st.write(halftime_score_probs)
-    
-    except Exception as e:
-        st.error(f"Error in prediction: {e}")
