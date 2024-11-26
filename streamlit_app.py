@@ -39,13 +39,11 @@ avg_points_home = st.sidebar.number_input("Average Points for Home Team", min_va
 avg_points_away = st.sidebar.number_input("Average Points for Away Team", min_value=0.0, step=0.1, value=1.5)
 
 # Betting Odds for HT and FT
-st.sidebar.subheader("Halftime/Fulltime Odds")
-st.sidebar.write("### Halftime Odds")
+st.sidebar.subheader("Halftime/Full-time Odds")
 ht_home = st.sidebar.number_input("Halftime Home Odds", min_value=1.0, step=0.1, value=2.5)
 ht_draw = st.sidebar.number_input("Halftime Draw Odds", min_value=1.0, step=0.1, value=2.9)
 ht_away = st.sidebar.number_input("Halftime Away Odds", min_value=1.0, step=0.1, value=3.1)
 
-st.sidebar.write("### Fulltime Odds")
 ft_home = st.sidebar.number_input("Fulltime Home Odds", min_value=1.0, step=0.1, value=2.2)
 ft_draw = st.sidebar.number_input("Fulltime Draw Odds", min_value=1.0, step=0.1, value=3.2)
 ft_away = st.sidebar.number_input("Fulltime Away Odds", min_value=1.0, step=0.1, value=3.4)
@@ -146,13 +144,16 @@ if st.button("Predict Probabilities and Insights"):
 
         # Identify High and Moderate Realistic Outcomes for Fulltime
         fulltime_high = {score: prob for score, prob in fulltime_score_probs.items() if prob > 0.05}
-        fulltime_moderate = {score: prob for score, prob in fulltime_score_probs.items() if 0.02 <= prob <= 0.05}
+        fulltime_moderate = {score: prob for score, prob in fulltime_score_probs.items() if 0.02 < prob <= 0.05}
 
-        # Display Final Recommendations and Visualizations
-        st.write("### Fulltime Score Predictions (High Likelihood):")
+        st.write("### Fulltime Score Probabilities (High Chance Outcomes)")
         st.write(fulltime_high)
 
-        st.write("### Fulltime Score Predictions (Moderate Likelihood):")
+        st.write("### Fulltime Score Probabilities (Moderate Chance Outcomes)")
         st.write(fulltime_moderate)
+
+        st.write("### Halftime Score Probabilities (High Chance Outcomes)")
+        st.write({score: prob for score, prob in halftime_score_probs.items() if prob > 0.05})
+
     except Exception as e:
-        st.write(f"Error: {e}")
+        st.write(f"Error: {str(e)}")
