@@ -39,19 +39,24 @@ avg_points_home = st.sidebar.number_input("Average Points for Home Team", min_va
 avg_points_away = st.sidebar.number_input("Average Points for Away Team", min_value=0.0, step=0.1, value=1.5)
 
 # Betting Odds for HT and FT
-st.sidebar.subheader("Halftime/Full-time Odds")
-
-# Halftime Odds
-st.sidebar.write("### Halftime Odds")
+st.sidebar.subheader("Halftime Odds")
 ht_home = st.sidebar.number_input("Halftime Home Odds", min_value=1.0, step=0.1, value=2.5)
 ht_draw = st.sidebar.number_input("Halftime Draw Odds", min_value=1.0, step=0.1, value=2.9)
 ht_away = st.sidebar.number_input("Halftime Away Odds", min_value=1.0, step=0.1, value=3.1)
 
-# Fulltime Odds
-st.sidebar.write("### Fulltime Odds")
+st.sidebar.subheader("Fulltime Odds")
 ft_home = st.sidebar.number_input("Fulltime Home Odds", min_value=1.0, step=0.1, value=2.2)
 ft_draw = st.sidebar.number_input("Fulltime Draw Odds", min_value=1.0, step=0.1, value=3.2)
 ft_away = st.sidebar.number_input("Fulltime Away Odds", min_value=1.0, step=0.1, value=3.4)
+
+# Display HT/FT Odds in Sidebar
+st.sidebar.markdown("### Halftime/Full-time Odds")
+st.sidebar.write(f"**Halftime Home Odds:** {ht_home}")
+st.sidebar.write(f"**Halftime Draw Odds:** {ht_draw}")
+st.sidebar.write(f"**Halftime Away Odds:** {ht_away}")
+st.sidebar.write(f"**Fulltime Home Odds:** {ft_home}")
+st.sidebar.write(f"**Fulltime Draw Odds:** {ft_draw}")
+st.sidebar.write(f"**Fulltime Away Odds:** {ft_away}")
 
 # Correct Score Odds for HT and FT
 def get_correct_score_odds(prefix, max_goals, half_time=True):
@@ -147,12 +152,9 @@ if st.button("Predict Probabilities and Insights"):
         halftime_other_prob = 1 - sum(halftime_score_probs.values())
         halftime_score_probs["Other"] = halftime_other_prob
 
-        # Identify High and Moderate Realistic Outcomes for Fulltime and Halftime
-        st.subheader("Fulltime Score Probabilities")
-        st.write(fulltime_score_probs)
-
-        st.subheader("Halftime Score Probabilities")
-        st.write(halftime_score_probs)
+        # Display Fulltime and Halftime Score Probabilities
+        st.write(f"Fulltime Score Probabilities: {fulltime_score_probs}")
+        st.write(f"Halftime Score Probabilities: {halftime_score_probs}")
 
     except Exception as e:
-        st.error(f"Error in prediction: {e}")
+        st.error(f"Error predicting: {e}")
