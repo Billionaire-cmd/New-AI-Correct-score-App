@@ -6,5 +6,7 @@ scipy
 altair 
 scipy
 beautifulsoup4
-selenium
+train_test_split
+RandomForestClassifier
+sklearn
 
