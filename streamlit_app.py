@@ -19,7 +19,7 @@ def calculate_goal_probabilities(avg_home, avg_away):
     return probabilities
 
 # --- Streamlit App ---
-st.title("Football Match Predictor: HT/FT Correct Scores")
+st.title("⚽🤖Football Match Predictor: HT/FT Correct Scores")
 
 # Upload historical data
 st.sidebar.header("Upload Historical Match Data")
