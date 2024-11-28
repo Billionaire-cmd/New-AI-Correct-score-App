@@ -1,102 +1,64 @@
 import streamlit as st
-import requests
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-import time
-import os
+import pandas as pd
+import numpy as np
+from scipy.stats import poisson
 
+# Set page configuration
+st.set_page_config(page_title="HT/FT Score Predictor", layout="wide")
 
-# Function to scrape data from SoccerStats
-def get_soccerstats_data():
-    url = "https://www.soccerstats.com/matches.asp?matchday=1"
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-    }
-    response = requests.get(url, headers=headers)
+# Title
+st.title("Halftime and Full-time Score Predictor")
 
-    if response.status_code != 200:
-        st.error(f"Error fetching data from SoccerStats: {response.status_code}")
-        return []
+# Sidebar inputs
+st.sidebar.header("Match Data Input")
+team_a = st.sidebar.text_input("Team A", "Team A")
+team_b = st.sidebar.text_input("Team B", "Team B")
+avg_goals_a = st.sidebar.number_input("Average Goals by Team A", min_value=0.0, value=1.2)
+avg_goals_b = st.sidebar.number_input("Average Goals by Team B", min_value=0.0, value=1.1)
+odds_a_win = st.sidebar.number_input("Odds for Team A Win", min_value=1.0, value=2.5)
+odds_b_win = st.sidebar.number_input("Odds for Team B Win", min_value=1.0, value=2.8)
+odds_draw = st.sidebar.number_input("Odds for Draw", min_value=1.0, value=3.0)
 
-    soup = BeautifulSoup(response.content, "html.parser")
-    table = soup.find("table", {"id": "btable"})  # Modify if necessary
-    matches = []
+# Prediction logic
+st.subheader(f"Prediction for {team_a} vs {team_b}")
 
-    if table:
-        rows = table.find_all("tr")[1:]  # Skip header row
-        for row in rows:
-            cols = row.find_all("td")
-            if len(cols) > 1:
-                match = {
-                    "home_team": cols[1].text.strip(),
-                    "away_team": cols[3].text.strip(),
-                    "score": cols[4].text.strip(),
-                }
-                matches.append(match)
-    return matches
+# Poisson distribution for halftime and full-time scores
+def poisson_prob(mean, score):
+    return poisson.pmf(score, mean)
 
+# Generate probabilities for scorelines
+max_goals = 5
+ht_prob_matrix = np.zeros((max_goals+1, max_goals+1))
+ft_prob_matrix = np.zeros((max_goals+1, max_goals+1))
 
-# Function to scrape data from StatsChecker using Selenium
-def get_statschecker_data():
-    url = "https://www.statschecker.com/stats/goals-per-game/average-goals-per-game-stats"
+for i in range(max_goals+1):
+    for j in range(max_goals+1):
+        ht_prob_matrix[i, j] = poisson_prob(avg_goals_a / 2, i) * poisson_prob(avg_goals_b / 2, j)
+        ft_prob_matrix[i, j] = poisson_prob(avg_goals_a, i) * poisson_prob(avg_goals_b, j)
 
-    # Set up Selenium WebDriver
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-    driver_path = "path/to/chromedriver"  # Replace with your ChromeDriver path
+# Convert to DataFrame for display
+ht_df = pd.DataFrame(ht_prob_matrix, columns=[f"{team_b} {j}" for j in range(max_goals+1)], 
+                     index=[f"{team_a} {i}" for i in range(max_goals+1)])
+ft_df = pd.DataFrame(ft_prob_matrix, columns=[f"{team_b} {j}" for j in range(max_goals+1)], 
+                     index=[f"{team_a} {i}" for i in range(max_goals+1)])
 
-    if not os.path.exists(driver_path):
-        st.error("ChromeDriver not found. Please ensure it is installed and the path is correct.")
-        return []
+# Display probabilities
+st.write("### Halftime Correct Score Probabilities")
+st.dataframe(ht_df.style.background_gradient(cmap="Blues"))
 
-    driver_service = Service(driver_path)
-    driver = webdriver.Chrome(service=driver_service, options=options)
+st.write("### Full-time Correct Score Probabilities")
+st.dataframe(ft_df.style.background_gradient(cmap="Greens"))
 
-    stats = []
-    try:
-        driver.get(url)
-        time.sleep(5)  # Wait for the page to load
+# Most likely scores
+ht_most_likely = np.unravel_index(np.argmax(ht_prob_matrix), ht_prob_matrix.shape)
+ft_most_likely = np.unravel_index(np.argmax(ft_prob_matrix), ft_prob_matrix.shape)
 
-        # Scrape table data
-        rows = driver.find_elements(By.XPATH, "//table[@class='table']/tbody/tr")
-        for row in rows:
-            cols = row.find_elements(By.TAG_NAME, "td")
-            if len(cols) > 1:
-                stat = {
-                    "league": cols[0].text.strip(),
-                    "average_goals": cols[1].text.strip(),
-                }
-                stats.append(stat)
-    except Exception as e:
-        st.error(f"Error fetching data from StatsChecker: {e}")
-    finally:
-        driver.quit()
+st.write(f"Most likely **halftime score**: {team_a} {ht_most_likely[0]} - {team_b} {ht_most_likely[1]}")
+st.write(f"Most likely **full-time score**: {team_a} {ft_most_likely[0]} - {team_b} {ft_most_likely[1]}")
 
-    return stats
+# Add interactivity for additional metrics if needed
+if st.sidebar.checkbox("Show advanced metrics"):
+    st.write("### Advanced Metrics Coming Soon!")
 
-
-# Streamlit App
-st.title("Soccer and Stats Analysis")
-
-# Display SoccerStats data
-st.header("Matches from SoccerStats")
-soccerstats_data = get_soccerstats_data()
-if soccerstats_data:
-    for match in soccerstats_data:
-        st.write(f"{match['home_team']} vs {match['away_team']} - Score: {match['score']}")
-else:
-    st.write("No data available from SoccerStats.")
-
-# Display StatsChecker data
-st.header("Average Goals Per Game from StatsChecker")
-statschecker_data = get_statschecker_data()
-if statschecker_data:
-    for stat in statschecker_data:
-        st.write(f"League: {stat['league']} - Avg Goals: {stat['average_goals']}")
-else:
-    st.write("No data available from StatsChecker.")
+# Footer
+st.markdown("### Powered by Poisson Distribution and Machine Learning")
