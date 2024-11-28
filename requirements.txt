@@ -7,3 +7,6 @@ altair
 scipy
 sklearn
 RandomForestClassifier
+scikit-learn
+seaborn
+requests
