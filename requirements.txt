@@ -5,8 +5,5 @@ matplotlib==3.9.2
 scipy
 altair 
 scipy
-beautifulsoup4
-train_test_split
-RandomForestClassifier
 sklearn
 
