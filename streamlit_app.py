@@ -1,19 +1,31 @@
 import streamlit as st
 import requests
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+import time
+
 
 # Function to scrape data from SoccerStats
 def get_soccerstats_data():
     url = "https://www.soccerstats.com/matches.asp?matchday=1"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code != 200:
+        st.error(f"Error fetching data from SoccerStats: {response.status_code}")
+        return []
 
-    # Example: Scrape match data (you can customize this to fit your needs)
-    table = soup.find("table", {"id": "btable"})
+    soup = BeautifulSoup(response.content, "html.parser")
+    table = soup.find("table", {"id": "btable"})  # Modify as needed
     matches = []
 
     if table:
-        rows = table.find_all("tr")[1:]  # Skip the header row
+        rows = table.find_all("tr")[1:]  # Skip header row
         for row in rows:
             cols = row.find_all("td")
             if len(cols) > 1:
@@ -23,36 +35,46 @@ def get_soccerstats_data():
                     "score": cols[4].text.strip(),
                 }
                 matches.append(match)
-
     return matches
 
 
-# Function to scrape data from StatsChecker
+# Function to scrape data from StatsChecker using Selenium
 def get_statschecker_data():
     url = "https://www.statschecker.com/stats/goals-per-game/average-goals-per-game-stats"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
 
-    # Example: Scrape average goals per game stats
-    table = soup.find("table", {"class": "table"})  # Modify based on the actual class name
+    # Set up Selenium WebDriver (ensure you have downloaded ChromeDriver)
+    options = Options()
+    options.add_argument("--headless")  # Run in headless mode
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    driver_service = Service("path/to/chromedriver")  # Replace with the path to your ChromeDriver
+    driver = webdriver.Chrome(service=driver_service, options=options)
+
     stats = []
+    try:
+        driver.get(url)
+        time.sleep(5)  # Wait for the page to load
 
-    if table:
-        rows = table.find_all("tr")[1:]  # Skip the header row
+        # Scrape table data
+        rows = driver.find_elements(By.XPATH, "//table[@class='table']/tbody/tr")
         for row in rows:
-            cols = row.find_all("td")
+            cols = row.find_elements(By.TAG_NAME, "td")
             if len(cols) > 1:
                 stat = {
                     "league": cols[0].text.strip(),
                     "average_goals": cols[1].text.strip(),
                 }
                 stats.append(stat)
+    except Exception as e:
+        st.error(f"Error fetching data from StatsChecker: {e}")
+    finally:
+        driver.quit()
 
     return stats
 
 
 # Streamlit App
-st.title("Soccer Stats and Goals Analysis")
+st.title("Soccer and Stats Analysis")
 
 # Display SoccerStats data
 st.header("Matches from SoccerStats")
