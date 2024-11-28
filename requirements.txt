@@ -7,4 +7,4 @@ altair
 scipy
 beautifulsoup4
 selenium
-Chrome 131.0.6778.81
+Chrome131.0.6778.81
