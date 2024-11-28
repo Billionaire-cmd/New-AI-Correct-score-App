@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 import time
+import os
 
 
 # Function to scrape data from SoccerStats
@@ -15,13 +16,13 @@ def get_soccerstats_data():
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     }
     response = requests.get(url, headers=headers)
-    
+
     if response.status_code != 200:
         st.error(f"Error fetching data from SoccerStats: {response.status_code}")
         return []
 
     soup = BeautifulSoup(response.content, "html.parser")
-    table = soup.find("table", {"id": "btable"})  # Modify as needed
+    table = soup.find("table", {"id": "btable"})  # Modify if necessary
     matches = []
 
     if table:
@@ -42,12 +43,18 @@ def get_soccerstats_data():
 def get_statschecker_data():
     url = "https://www.statschecker.com/stats/goals-per-game/average-goals-per-game-stats"
 
-    # Set up Selenium WebDriver (ensure you have downloaded ChromeDriver)
+    # Set up Selenium WebDriver
     options = Options()
-    options.add_argument("--headless")  # Run in headless mode
+    options.add_argument("--headless")
     options.add_argument("--disable-gpu")
     options.add_argument("--no-sandbox")
-    driver_service = Service("path/to/chromedriver")  # Replace with the path to your ChromeDriver
+    driver_path = "path/to/chromedriver"  # Replace with your ChromeDriver path
+
+    if not os.path.exists(driver_path):
+        st.error("ChromeDriver not found. Please ensure it is installed and the path is correct.")
+        return []
+
+    driver_service = Service(driver_path)
     driver = webdriver.Chrome(service=driver_service, options=options)
 
     stats = []
