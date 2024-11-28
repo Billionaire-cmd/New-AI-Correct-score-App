@@ -6,4 +6,5 @@ scipy
 altair 
 scipy
 beautifulsoup4
+selenium
 
