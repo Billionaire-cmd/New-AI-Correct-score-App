@@ -10,7 +10,7 @@ from scipy.stats import poisson
 import requests
 
 # Title and Sidebar
-st.title("HT/FT Correct Score Prediction App")
+st.title("🤖🤖🤖💯💯💯⚽ HT/FT Correct Score Prediction App")
 st.sidebar.header("Match Settings")
 st.sidebar.write("Adjust parameters for predictions.")
 
