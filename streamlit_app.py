@@ -7,7 +7,7 @@ from scipy.stats import poisson
 st.set_page_config(page_title="HT/FT Score Predictor", layout="wide")
 
 # Title
-st.title("Halftime and Full-time Score Predictor")
+st.title("🤖🤖🤖💯💯💯⚽Halftime and Full-time Score Predictor")
 
 # Sidebar inputs
 st.sidebar.header("Match Data Input")
