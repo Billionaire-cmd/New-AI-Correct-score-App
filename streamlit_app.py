@@ -144,13 +144,7 @@ correct_score = st.sidebar.checkbox("Correct score")
 ht_ft = st.sidebar.checkbox("HT/FT")
 exact_goals = st.sidebar.checkbox("Exact goals")
 btts = st.sidebar.checkbox("Both teams to score (BTTS)")
-
-    # Correct Score Probabilities
-    correct_score_probs = {}
-    for i in range(6):  # Home goals (0-5)
-        for j in range(6):  # Away goals (0-5)
-            prob = home_goals_dist.pmf(i) * away_goals_dist.pmf(j)
-            correct_score_probs[f"{i}-{j}"] = prob
+[f"{i}-{j}"] = prob
 
     # Most Likely Scoreline
     most_likely_scoreline = max(correct_score_probs, key=correct_score_probs.get)
