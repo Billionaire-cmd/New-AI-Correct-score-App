@@ -1,6 +1,6 @@
 import streamlit as st
 import numpy as np
-from scipy.stats import poisson, skellam
+from scipy.stats import poisson
 
 # Function to calculate Poisson probabilities
 def poisson_prob(lambda_rate, k):
@@ -38,6 +38,7 @@ def calculate_predictions():
     ft_draw_odds = st.sidebar.number_input("FT Draw Odds", min_value=0.0, value=3.70)
     ft_away_odds = st.sidebar.number_input("FT Away Odds", min_value=0.0, value=2.14)
     over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)
+    under_2_5_odds = st.number_input("Under 2.5 Goals Odds", min_value=1.0, value=1.90)
 
     st.sidebar.header("Team Strengths")
     home_attack = st.sidebar.number_input("Home Attack Strength", value=1.00, format="%.2f")
@@ -111,6 +112,18 @@ def calculate_predictions():
         st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.2f}%")
         st.write(f"🔄 **BTTS Probability (Yes):** {btts_prob:.2f}%")
 
+        # BTTS Recommendation
+        if btts_prob >= 50:
+            st.write("🔔 **Recommendation: Both Teams to Score (BTTS) is likely!**")
+        else:
+            st.write("🚫 **Recommendation: BTTS is unlikely!**")
+
+        # Over 2.5 Goals Recommendation
+        if over_2_5_prob >= 50:
+            st.write("🔔 **Recommendation: Over 2.5 Goals is likely!**")
+        else:
+            st.write("🚫 **Recommendation: Under 2.5 Goals is likely!**")
+
         st.subheader("HT/FT Probabilities")
         for ht_ft, prob in ht_ft_probs.items():
             st.write(f"{ht_ft}: {prob:.2f}%")
@@ -144,14 +157,13 @@ def calculate_predictions():
             ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
             ft_results.append((home_goals, away_goals, ft_prob))
 
-        # Display HT and FT results
-        st.subheader("HT Scoreline Probabilities")
-        for home_goals, away_goals, prob in ht_results:
-            st.write(f"{home_goals}-{away_goals}: {prob * 100:.2f}%")
+        st.subheader("Half-Time Scoreline Probabilities")
+        for home_goals, away_goals, prob in sorted(ht_results, key=lambda x: x[2], reverse=True)[:10]:
+            st.write(f"HT {home_goals}-{away_goals}: {prob * 100:.2f}%")
 
-        st.subheader("FT Scoreline Probabilities")
-        for home_goals, away_goals, prob in ft_results:
-            st.write(f"{home_goals}-{away_goals}: {prob * 100:.2f}%")
+        st.subheader("Full-Time Scoreline Probabilities")
+        for home_goals, away_goals, prob in sorted(ft_results, key=lambda x: x[2], reverse=True)[:10]:
+            st.write(f"FT {home_goals}-{away_goals}: {prob * 100:.2f}%")
 
 # Running the Streamlit app
 if __name__ == "__main__":
