@@ -10,6 +10,12 @@ def poisson_prob(lambda_rate, k):
 def implied_prob(odds):
     return 1 / odds * 100
 
+# Function to adjust probabilities for over 2.5 goals
+def adjust_for_over_2_5_goals(over_2_5_odds, poisson_prob):
+    over_2_5_prob = implied_prob(over_2_5_odds)
+    adjusted_prob = poisson_prob * (over_2_5_prob / 100)
+    return adjusted_prob
+
 # Generate all possible scorelines (for both HT and FT)
 def generate_scorelines(max_goals=5):
     scorelines = [(home_goals, away_goals) for home_goals in range(max_goals + 1) for away_goals in range(max_goals + 1)]
@@ -61,20 +67,19 @@ def calculate_predictions():
         home_goals_dist_ht = poisson(home_expected_goals / 3)
         away_goals_dist_ht = poisson(away_expected_goals / 8)
 
-        # Generate all possible scorelines
-        scorelines = generate_scorelines()
-
         # Correct Score Probabilities for Full-time
         correct_score_probs_ft = {}
-        for i, j in scorelines:  # Home goals (0-5) and Away goals (0-5)
-            prob = home_goals_dist.pmf(i) * away_goals_dist.pmf(j)
-            correct_score_probs_ft[f"{i}-{j}"] = prob
+        for i in range(6):  # Home goals (0-5)
+            for j in range(6):  # Away goals (0-5)
+                prob = home_goals_dist.pmf(i) * away_goals_dist.pmf(j)
+                correct_score_probs_ft[f"{i}-{j}"] = prob
 
         # Correct Score Probabilities for Halftime
         correct_score_probs_ht = {}
-        for i, j in scorelines:  # Home goals (0-5) and Away goals (0-5)
-            prob = home_goals_dist_ht.pmf(i) * away_goals_dist_ht.pmf(j)
-            correct_score_probs_ht[f"{i}-{j}"] = prob
+        for i in range(6):  # Home goals (0-5)
+            for j in range(6):  # Away goals (0-5)
+                prob = home_goals_dist_ht.pmf(i) * away_goals_dist_ht.pmf(j)
+                correct_score_probs_ht[f"{i}-{j}"] = prob
 
         # Most Likely Scoreline Full-time
         most_likely_scoreline_ft = max(correct_score_probs_ft, key=correct_score_probs_ft.get)
@@ -115,23 +120,36 @@ def calculate_predictions():
             for i in range(1, 6) for j in range(1, 6)
         ) * 100
 
+        # BTTS GG/NG ODDS Calculation
+        btts_gg_prob = implied_prob(btts_gg_odds)
+        btts_ng_prob = implied_prob(btts_ng_odds)
+
+        # HT/FT Probabilities
+        ht_ft_probs = {
+            "1/1": home_win_prob / 3, "1/X": draw_prob / 3, "1/2": away_win_prob / 3,
+            "X/1": home_win_prob / 1, "X/X": draw_prob / 2, "X/2": away_win_prob / 2,
+            "2/1": home_win_prob / 3, "2/X": draw_prob / 3, "2/2": away_win_prob / 3
+        }
+        
         # Display Outputs
         st.subheader("Predicted Probabilities")
         st.write(f"🏠 **Home Win Probability:** {home_win_prob:.2f}%")
         st.write(f"🤝 **Draw Probability:** {draw_prob:.2f}%")
-        st.write(f"📈⚽ **Away Win Probability:** {away_win_prob:.2f}%")
+        st.write(f"📈 **Away Win Probability:** {away_win_prob:.2f}%")
         st.write(f"⚽ **Over 2.5 Goals Probability:** {over_2_5_prob:.2f}%")
-        st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.3f}%")
-        st.write(f"🔄 **BTTS Probability (Yes):** {btts_prob:.5f}%")
-        
-        st.write(f"**Most Likely Halftime Correct Score:** {most_likely_scoreline_ht} - Probability: {most_likely_scoreline_prob_ht:.2f}%")
-        st.write(f"**Most Likely Full-time Correct Score:** {most_likely_scoreline_ft} - Probability: {most_likely_scoreline_prob_ft:.2f}%")
-        
-        # Multi-Scoreline
-        st.write("**Top 2 Halftime Correct Score Multi-Scoreline Probabilities**")
-        for scoreline, prob in sorted_ht_probs:
-            st.write(f"{scoreline}: {prob:.2f}%")
+        st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.2f}%")
+        st.write(f"🔵 **BTTS GG Probability:** {btts_gg_prob:.2f}%")
+        st.write(f"🔴 **BTTS NG Probability:** {btts_ng_prob:.2f}%")
 
-        st.write("**Top 2 Fulltime Correct Score Multi-Scoreline Probabilities**")
-        for scoreline, prob in sorted_ft_probs:
-            st.write(f"{scoreline}: {prob:.2f}%")
+        # Display HT/FT Predictions
+        st.write("🏆 **Top 2 HT/FT Predictions:**")
+        st.write(f"1. {sorted_ht_probs[0][0]} - {sorted_ht_probs[0][1]*100:.2f}%")
+        st.write(f"2. {sorted_ht_probs[1][0]} - {sorted_ht_probs[1][1]*100:.2f}%")
+
+        # Display Correct Score Predictions
+        st.write("🏁 **Top 2 Full-Time Predictions:**")
+        st.write(f"1. {sorted_ft_probs[0][0]} - {sorted_ft_probs[0][1]*100:.2f}%")
+        st.write(f"2. {sorted_ft_probs[1][0]} - {sorted_ft_probs[1][1]*100:.2f}%")
+
+if __name__ == "__main__":
+    calculate_predictions()
