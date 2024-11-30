@@ -133,7 +133,7 @@ def calculate_predictions():
 
         # Over 2.5 Goals Recommendation
         if over_2_5_prob >= 50:
-            st.write("🔔 **Recommendation: Over 2.5 Goals is likely!**")
+            st.write("🔔🔔 **Recommendation: Over 2.5 Goals is likely!**")
         else:
             st.write("🚫 **Recommendation: Under 2.5 Goals is likely!**")
 
