@@ -109,7 +109,7 @@ with st.sidebar:
         st.success("Prediction submitted! Results will be displayed below.")
 
 # Main app
-st.title("🤖🤖🤖 ⚽💯💯💯 Rabiotic Football Match Prediction using Poisson Distribution")
+st.title("🤖🤖⚽⚽⚽💯💯💯 Rabiotic Football Match Prediction using Poisson Distribution")
 st.sidebar.header("Input Parameters")
 
 # Sidebar Inputs
