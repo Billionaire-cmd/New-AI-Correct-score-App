@@ -199,14 +199,13 @@ ht_ft_probs = calculate_ht_ft_probs(home_win_prob, draw_prob, away_win_prob)
 print("HT/FT Probabilities (in %):")
 for outcome, prob in ht_ft_probs.items():
     print(f"{outcome}: {prob:.2f}%")
+# Identify the most likely HT/FT outcome
+most_likely_outcome = max(ht_ft_probs, key=ht_ft_probs.get)
+most_likely_prob = ht_ft_probs[most_likely_outcome]
 
 # Provide a recommendation
 print(f"\nRecommendation:")
 print(f"The most likely HT/FT outcome is '{most_likely_outcome}' with a probability of {most_likely_prob:.2f}%.\n")
-
-# Identify the most likely HT/FT outcome
-most_likely_outcome = max(ht_ft_probs, key=ht_ft_probs.get)
-most_likely_prob = ht_ft_probs[most_likely_outcome]
 
 # Call the function to run the calculations
 calculate_predictions()
