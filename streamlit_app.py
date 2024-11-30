@@ -89,9 +89,9 @@ def calculate_predictions():
         most_likely_scoreline_ht = max(correct_score_probs_ht, key=correct_score_probs_ht.get)
         most_likely_scoreline_prob_ht = correct_score_probs_ht[most_likely_scoreline_ht] * 100
 
-        # Multi-Scoreline Correct Score Probabilities (Top 3)
-        sorted_ht_probs = sorted(correct_score_probs_ht.items(), key=lambda x: x[1], reverse=True)[:3]
-        sorted_ft_probs = sorted(correct_score_probs_ft.items(), key=lambda x: x[1], reverse=True)[:3]
+        # Multi-Scoreline Correct Score Probabilities (Top 2)
+        sorted_ht_probs = sorted(correct_score_probs_ht.items(), key=lambda x: x[1], reverse=True)[:2]
+        sorted_ft_probs = sorted(correct_score_probs_ft.items(), key=lambda x: x[1], reverse=True)[:2]
 
         # Probabilities for Outcomes
         home_win_prob = sum(
@@ -144,11 +144,11 @@ def calculate_predictions():
         st.write(f"**Most Likely Full-time Correct Score:** {most_likely_scoreline_ft} - Probability: {most_likely_scoreline_prob_ft:.2f}%")
         
         # Multi-Scoreline
-        st.write("**Top 3 Halftime Correct Score Multi-Scoreline Probabilities**")
+        st.write("**Top 2 Halftime Correct Score Multi-Scoreline Probabilities**")
         for scoreline, prob in sorted_ht_probs:
             st.write(f"{scoreline}: {prob:.2f}%")
 
-        st.write("**Top 3 Full-time Correct Score Multi-Scoreline Probabilities**")
+        st.write("**Top 2 Full-time Correct Score Multi-Scoreline Probabilities**")
         for scoreline, prob in sorted_ft_probs:
             st.write(f"{scoreline}: {prob:.2f}%")
 
