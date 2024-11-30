@@ -136,8 +136,6 @@ if st.sidebar.button("Submit Predictions"):
     st.subheader("Most Likely Outcome")
     st.write(f"**The most likely scoreline is {most_likely_scoreline}** with a probability of {most_likely_scoreline_prob:.2f}%.")
 
-
-
     # Generate all possible scorelines (for both HT and FT)
     max_goals = 5  # Define the maximum number of goals to consider for scorelines
     ht_scorelines = generate_scorelines(max_goals)
@@ -201,3 +199,9 @@ if st.sidebar.button("Submit Predictions"):
 # Main app
 st.title("🤖🤖🤖⚽⚽💯💯💯 Rabiotic Football Match Prediction using Poisson Distribution")
 calculate_predictions()
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
