@@ -6,5 +6,4 @@ scipy
 altair 
 scipy
 requests
-seaborn
 sklearn
