@@ -142,8 +142,7 @@ def calculate_predictions():
         
         st.write(f"**Most Likely Halftime Correct Score:** {most_likely_scoreline_ht} - Probability: {most_likely_scoreline_prob_ht:.2f}%")
         st.write(f"**Most Likely Full-time Correct Score:** {most_likely_scoreline_ft} - Probability: {most_likely_scoreline_prob_ft:.2f}%")
-        st.write(f"**Most Likely HT/FT:** {most_likely_HT/FT_Probabilities}
-      
+        
         # Multi-Scoreline
         st.write("**Top 3 Halftime Correct Score Multi-Scoreline Probabilities**")
         for scoreline, prob in sorted_ht_probs:
