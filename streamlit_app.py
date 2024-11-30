@@ -89,6 +89,10 @@ def calculate_predictions():
         most_likely_scoreline_ht = max(correct_score_probs_ht, key=correct_score_probs_ht.get)
         most_likely_scoreline_prob_ht = correct_score_probs_ht[most_likely_scoreline_ht] * 100
 
+        # Multi-Scoreline Correct Score Probabilities (Top 3)
+        sorted_ht_probs = sorted(correct_score_probs_ht.items(), key=lambda x: x[1], reverse=True)[:3]
+        sorted_ft_probs = sorted(correct_score_probs_ft.items(), key=lambda x: x[1], reverse=True)[:3]
+
         # Probabilities for Outcomes
         home_win_prob = sum(
             home_goals_dist.pmf(i) * sum(away_goals_dist.pmf(j) for j in range(i))
@@ -134,14 +138,19 @@ def calculate_predictions():
         st.write(f"📈 **Away Win Probability:** {away_win_prob:.2f}%")
         st.write(f"⚽ **Over 2.5 Goals Probability:** {over_2_5_prob:.2f}%")
         st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.2f}%")
-        st.write(f"🔄🔔 **BTTS Probability (Yes):** {btts_prob:.2f}%")
+        st.write(f"🔄 **BTTS Probability (Yes):** {btts_prob:.2f}%")
         
-        # BTTS GG/NG Odds Recommendation
-        st.write(f"**BTTS GG Odds Implied Probability:** {btts_gg_prob:.2f}%")
-        st.write(f"**BTTS NG Odds Implied Probability:** {btts_ng_prob:.2f}%")
-
         st.write(f"**Most Likely Halftime Correct Score:** {most_likely_scoreline_ht} - Probability: {most_likely_scoreline_prob_ht:.2f}%")
         st.write(f"**Most Likely Full-time Correct Score:** {most_likely_scoreline_ft} - Probability: {most_likely_scoreline_prob_ft:.2f}%")
+
+        # Multi-Scoreline
+        st.write("**Top 3 Halftime Correct Score Multi-Scoreline Probabilities**")
+        for scoreline, prob in sorted_ht_probs:
+            st.write(f"{scoreline}: {prob:.2f}%")
+
+        st.write("**Top 3 Full-time Correct Score Multi-Scoreline Probabilities**")
+        for scoreline, prob in sorted_ft_probs:
+            st.write(f"{scoreline}: {prob:.2f}%")
 
         # HT/FT Predictions
         st.write("**HT/FT Probabilities**")
