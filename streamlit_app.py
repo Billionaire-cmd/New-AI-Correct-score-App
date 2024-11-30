@@ -127,7 +127,7 @@ def calculate_predictions():
         # HT/FT Probabilities
         ht_ft_probs = {
             "1/1": home_win_prob / 3, "1/X": draw_prob / 3, "1/2": away_win_prob / 3,
-            "X/1": home_win_prob / 4, "X/X": draw_prob / 2, "X/2": away_win_prob / 1,
+            "X/1": home_win_prob / 1, "X/X": draw_prob / 2, "X/2": away_win_prob / 2,
             "2/1": home_win_prob / 3, "2/X": draw_prob / 3, "2/2": away_win_prob / 3
         }
 
