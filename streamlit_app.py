@@ -157,5 +157,57 @@ def calculate_predictions():
         for outcome, prob in ht_ft_probs.items():
             st.write(f"{outcome}: {prob:.2f}%")
 
+        # Function to calculate HT/FT probabilities
+def calculate_ht_ft_probs(home_win_prob, draw_prob, away_win_prob):
+    """
+    Calculate the probabilities for all HT/FT outcomes.
+
+    Parameters:
+    - home_win_prob (float): Probability of a home win (in %)
+    - draw_prob (float): Probability of a draw (in %)
+    - away_win_prob (float): Probability of an away win (in %)
+
+    Returns:
+    - dict: A dictionary of HT/FT outcomes with their probabilities
+    """
+    ht_ft_probs = {
+        "1/1": home_win_prob * 4.24,
+        "1/X": home_win_prob * 4.43,
+        "1/2": home_win_prob * 18.08,
+        "X/1": draw_prob * 12.73,
+        "X/X": draw_prob * 6.64,
+        "X/2": draw_prob * 27.12,
+        "2/1": away_win_prob * 4.43,
+        "2/X": away_win_prob * 4.43,
+        "2/2": away_win_prob * 18.08,
+    }
+    return ht_ft_probs
+
+# Example input probabilities (replace these with your actual data)
+home_win_prob = 40.0  # Home win probability in percentage
+draw_prob = 30.0      # Draw probability in percentage
+away_win_prob = 30.0  # Away win probability in percentage
+
+# Validate inputs
+if home_win_prob + draw_prob + away_win_prob != 100.0:
+    raise ValueError("The probabilities must add up to 100%.")
+
+# Calculate HT/FT probabilities
+ht_ft_probs = calculate_ht_ft_probs(home_win_prob, draw_prob, away_win_prob)
+
+# Display HT/FT probabilities
+print("HT/FT Probabilities (in %):")
+for outcome, prob in ht_ft_probs.items():
+    print(f"{outcome}: {prob:.2f}%")
+
+# Identify the most likely HT/FT outcome
+most_likely_outcome = max(ht_ft_probs, key=ht_ft_probs.get)
+most_likely_prob = ht_ft_probs[most_likely_outcome]
+
+# Provide a recommendation
+print(f"\nRecommendation:")
+print(f"The most likely HT/FT outcome is '{most_likely_outcome}' with a probability of {most_likely_prob:.2f}%.\n")
+
+
 # Call the function to run the calculations
 calculate_predictions()
