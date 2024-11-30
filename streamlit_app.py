@@ -119,7 +119,7 @@ def calculate_predictions():
         st.subheader("Predicted Probabilities")
         st.write(f"🏠 **Home Win Probability:** {home_win_prob:.2f}%")
         st.write(f"🤝 **Draw Probability:** {draw_prob:.2f}%")
-        st.write(f"📈 **Away Win Probability:** {away_win_prob:.2f}%")
+        st.write(f"📈⚽ **Away Win Probability:** {away_win_prob:.2f}%")
         st.write(f"⚽ **Over 2.5 Goals Probability:** {over_2_5_prob:.2f}%")
         st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.3f}%")
         st.write(f"🔄 **BTTS Probability (Yes):** {btts_prob:.5f}%")
