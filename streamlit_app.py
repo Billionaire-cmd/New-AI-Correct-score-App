@@ -24,32 +24,32 @@ def generate_scorelines(max_goals=5):
 # Main function to calculate and display predictions
 def calculate_predictions():
     # Team A and Team B Stats
-    team_a_home_goals = st.number_input("Team A Average Goals Scored (Home)", min_value=0.0, value=0.30)
-    team_b_away_goals = st.number_input("Team B Average Goals Scored (Away)", min_value=0.0, value=1.00)
-    team_a_home_conceded = st.number_input("Team A Average Goals Conceded (Home)", min_value=0.0, value=1.50)
-    team_b_away_conceded = st.number_input("Team B Average Goals Conceded (Away)", min_value=0.0, value=2.00)
+    team_a_home_goals = st.number_input("Team A Average Goals Scored (Home)", min_value=0.0, value=3.0)
+    team_b_away_goals = st.number_input("Team B Average Goals Scored (Away)", min_value=0.0, value=1.29)
+    team_a_home_conceded = st.number_input("Team A Average Goals Conceded (Home)", min_value=0.0, value=1.00)                                                                                                 
+    team_b_away_conceded = st.number_input("Team B Average Goals Conceded (Away)", min_value=0.0, value=1.79)
 
     # Sidebar Inputs for Odds
     st.sidebar.subheader("Odds Inputs")
-    ht_home_odds = st.sidebar.number_input("HT Home Odds", min_value=0.0, value=4.10)
-    ht_draw_odds = st.sidebar.number_input("HT Draw Odds", min_value=0.0, value=2.25)
-    ht_away_odds = st.sidebar.number_input("HT Away Odds", min_value=0.0, value=2.70)
-    ft_home_odds = st.sidebar.number_input("FT Home Odds", min_value=0.0, value=3.50)
-    ft_draw_odds = st.sidebar.number_input("FT Draw Odds", min_value=0.0, value=3.70)
-    ft_away_odds = st.sidebar.number_input("FT Away Odds", min_value=0.0, value=2.14)
-    over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)
-    under_2_5_odds = st.number_input("Under 2.5 Goals Odds", min_value=1.0, value=1.90)
+    ht_home_odds = st.sidebar.number_input("HT Home Odds", min_value=0.0, value=1.47)
+    ht_draw_odds = st.sidebar.number_input("HT Draw Odds", min_value=0.0, value=3.50)
+    ht_away_odds = st.sidebar.number_input("HT Away Odds", min_value=0.0, value=10.50)
+    ft_home_odds = st.sidebar.number_input("FT Home Odds", min_value=0.0, value=1.17)
+    ft_draw_odds = st.sidebar.number_input("FT Draw Odds", min_value=0.0, value=9.70)
+    ft_away_odds = st.sidebar.number_input("FT Away Odds", min_value=0.0, value=16.50)
+    over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.29)
+    under_2_5_odds = st.number_input("Under 2.5 Goals Odds", min_value=1.0, value=4.10)
 
     # Sidebar Inputs for BTTS (GG/NG) Odds
     st.sidebar.subheader("BTTS (GG/NG) Odds")
-    btts_gg_odds = st.sidebar.number_input("BTTS GG Odds", min_value=1.0, value=1.80)
+    btts_gg_odds = st.sidebar.number_input("BTTS GG Odds", min_value=1.0, value=1.82)
     btts_ng_odds = st.sidebar.number_input("BTTS NG Odds", min_value=1.0, value=2.00)
 
     st.sidebar.header("Team Strengths")
-    home_attack = st.sidebar.number_input("Home Attack Strength", value=1.00, format="%.2f")
-    home_defense = st.sidebar.number_input("Home Defense Strength", value=0.80, format="%.2f")
-    away_attack = st.sidebar.number_input("Away Attack Strength", value=0.80, format="%.2f")
-    away_defense = st.sidebar.number_input("Away Defense Strength", value=0.87, format="%.2f")
+    home_attack = st.sidebar.number_input("Home Attack Strength", value=2.39, format="%.2f")
+    home_defense = st.sidebar.number_input("Home Defense Strength", value=0.56, format="%.2f")
+    away_attack = st.sidebar.number_input("Away Attack Strength", value=1.20, format="%.2f")
+    away_defense = st.sidebar.number_input("Away Defense Strength", value=1.33, format="%.2f")
 
     # Submit Button
     if st.sidebar.button("Submit Prediction"):
