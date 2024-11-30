@@ -48,8 +48,8 @@ def calculate_predictions():
     st.sidebar.header("Team Strengths")
     home_attack = st.sidebar.number_input("Home Attack Strength", value=2.39, format="%.2f")
     home_defense = st.sidebar.number_input("Home Defense Strength", value=0.56, format="%.2f")
-    away_attack = st.sidebar.number_input("Away Attack Strength", value=1.20, format="%.f")
-    away_defense = st.sidebar.number_input("Away Defense Strength", value=1.33, format="%.f")
+    away_attack = st.sidebar.number_input("Away Attack Strength", value=1.20, format="%.2f")
+    away_defense = st.sidebar.number_input("Away Defense Strength", value=1.33, format="%.2f")
 
     # Submit Button
     if st.sidebar.button("Submit Prediction"):
@@ -57,7 +57,7 @@ def calculate_predictions():
 
         # Expected Goals Calculation
         home_expected_goals = st.sidebar.number_input("Home Team Expected Goals", value=1.36, format="%.2f")
-        away_expected_goals = st.sidebar.number_input("Away Team Expected Goals", value=2.96, format="%.1f")
+        away_expected_goals = st.sidebar.number_input("Away Team Expected Goals", value=2.96, format="%.2f")
 
         # Poisson Distributions for Full-time
         home_goals_dist = poisson(home_expected_goals)
@@ -200,14 +200,13 @@ print("HT/FT Probabilities (in %):")
 for outcome, prob in ht_ft_probs.items():
     print(f"{outcome}: {prob:.2f}%")
 
-# Identify the most likely HT/FT outcome
-most_likely_outcome = max(ht_ft_probs, key=ht_ft_probs.get)
-most_likely_prob = ht_ft_probs[most_likely_outcome]
-
 # Provide a recommendation
 print(f"\nRecommendation:")
 print(f"The most likely HT/FT outcome is '{most_likely_outcome}' with a probability of {most_likely_prob:.2f}%.\n")
 
+# Identify the most likely HT/FT outcome
+most_likely_outcome = max(ht_ft_probs, key=ht_ft_probs.get)
+most_likely_prob = ht_ft_probs[most_likely_outcome]
 
 # Call the function to run the calculations
 calculate_predictions()
