@@ -56,7 +56,7 @@ def calculate_predictions():
         st.success("Prediction submitted! Results will be displayed below.")
 
         # Expected Goals Calculation
-        home_expected_goals = st.sidebar.number_input("Home Team Expected Goals", value=1.36, format="%.3f")
+        home_expected_goals = st.sidebar.number_input("Home Team Expected Goals", value=1.36, format="%.2f")
         away_expected_goals = st.sidebar.number_input("Away Team Expected Goals", value=2.96, format="%.1f")
 
         # Poisson Distributions for Full-time
@@ -146,7 +146,7 @@ def calculate_predictions():
         # Multi-Scoreline
         st.write("**Top 3 Halftime Correct Score Multi-Scoreline Probabilities**")
         for scoreline, prob in sorted_ht_probs:
-            st.write(f"{scoreline}: {prob:.2f}%")
+            st.write(f"{scoreline}: {prob:.f}%")
 
         st.write("**Top 3 Full-time Correct Score Multi-Scoreline Probabilities**")
         for scoreline, prob in sorted_ft_probs:
