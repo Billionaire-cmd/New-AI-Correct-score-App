@@ -130,7 +130,26 @@ def calculate_predictions():
             "X/1": home_win_prob / 1, "X/X": draw_prob / 2, "X/2": away_win_prob / 2,
             "2/1": home_win_prob / 3, "2/X": draw_prob / 3, "2/2": away_win_prob / 3
         }
+        return ht_ft_probs
 
+        # Example Probabilities
+        home_win_prob = 14.55  # Example: 14.55% chance of home win
+        draw_prob = 15.19      # Example: 15.19% chance of draw
+        away_win_prob = 62.01  # Example: 62.01% chance of away win
+
+        # Calculate HT/FT Probabilities
+        ht_ft_probs = calculate_ht_ft_probs(home_win_prob, draw_prob, away_win_prob)
+
+       # Display HT/FT Probabilities
+        print("HT/FT Probabilities:")
+        for outcome, prob in ht_ft_probs.items():
+        print(f"{outcome}: {prob:.2f}%")
+
+       # Recommendation
+        recommendation = max(ht_ft_probs, key=ht_ft_probs.get)
+        print(f"\nRecommendation: The most likely HT/FT outcome is {recommendation} with a probability of {ht_ft_probs[recommendation]:.2f}%.")
+
+       
         # Display Outputs
         st.subheader("Predicted Probabilities")
         st.write(f"🏠 **Home Win Probability:** {home_win_prob:.2f}%")
