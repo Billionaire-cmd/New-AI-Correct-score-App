@@ -40,6 +40,10 @@ def calculate_predictions():
     over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)
     under_2_5_odds = st.number_input("Under 2.5 Goals Odds", min_value=1.0, value=1.90)
 
+    # BTTS GG/NG Odds
+    btts_gg_odds = st.sidebar.number_input("BTTS GG Odds (Both Teams to Score - Yes)", min_value=1.0, value=1.85)
+    btts_ng_odds = st.sidebar.number_input("BTTS NG Odds (Both Teams to Score - No)", min_value=1.0, value=1.95)
+
     st.sidebar.header("Team Strengths")
     home_attack = st.sidebar.number_input("Home Attack Strength", value=1.00, format="%.2f")
     home_defense = st.sidebar.number_input("Home Defense Strength", value=0.80, format="%.2f")
@@ -96,6 +100,10 @@ def calculate_predictions():
             for i in range(1, 6) for j in range(1, 6)
         ) * 100
 
+        # BTTS GG and NG Odds Adjustments
+        btts_gg_prob = implied_prob(btts_gg_odds)
+        btts_ng_prob = implied_prob(btts_ng_odds)
+
         # HT/FT Probabilities
         ht_ft_probs = {
             "1/1": home_win_prob / 2, "1/X": draw_prob / 2, "1/2": away_win_prob / 2,
@@ -112,7 +120,11 @@ def calculate_predictions():
         st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.2f}%")
         st.write(f"🔄 **BTTS Probability (Yes):** {btts_prob:.2f}%")
 
-        # BTTS Recommendation
+        # BTTS GG/NG Recommendation
+        st.sidebar.subheader("BTTS GG/NG Odds")
+        st.sidebar.write(f"GG Odds: {btts_gg_odds} -> Implied Probability: {btts_gg_prob:.2f}%")
+        st.sidebar.write(f"NG Odds: {btts_ng_odds} -> Implied Probability: {btts_ng_prob:.2f}%")
+
         if btts_prob >= 50:
             st.write("🔔 **Recommendation: Both Teams to Score (BTTS) is likely!**")
         else:
@@ -132,40 +144,6 @@ def calculate_predictions():
         for score, prob in sorted(correct_score_probs.items(), key=lambda x: x[1], reverse=True)[:10]:
             st.write(f"{score}: {prob * 100:.2f}%")
 
-        st.subheader("Most Likely Outcome")
-        st.write(f"**The most likely scoreline is {most_likely_scoreline}** with a probability of {most_likely_scoreline_prob:.2f}%.")
-        
-        # Generate HT and FT scorelines
-        ht_scorelines = generate_scorelines(max_goals=5)
-        ft_scorelines = generate_scorelines(max_goals=5)
-
-        # Calculate Poisson probabilities for HT and FT
-        team_a_ht_goal_rate = team_a_home_goals / 2  # Approximate halftime goals
-        team_b_ht_goal_rate = team_b_away_goals / 2  # Approximate halftime goals
-        team_a_ft_goal_rate = team_a_home_goals  # Full-time goal rate
-        team_b_ft_goal_rate = team_b_away_goals  # Full-time goal rate
-
-        ht_results = []
-        ft_results = []
-
-        # Calculate Poisson probabilities for HT and FT scorelines
-        for home_goals, away_goals in ht_scorelines:
-            ht_prob = poisson_prob(team_a_ht_goal_rate, home_goals) * poisson_prob(team_b_ht_goal_rate, away_goals)
-            ht_results.append((home_goals, away_goals, ht_prob))
-
-        for home_goals, away_goals in ft_scorelines:
-            ft_prob = poisson_prob(team_a_ft_goal_rate, home_goals) * poisson_prob(team_b_ft_goal_rate, away_goals)
-            ft_results.append((home_goals, away_goals, ft_prob))
-
-        st.subheader("Half-Time Scoreline Probabilities")
-        for home_goals, away_goals, prob in sorted(ht_results, key=lambda x: x[2], reverse=True)[:10]:
-            st.write(f"HT {home_goals}-{away_goals}: {prob * 100:.2f}%")
-
-        st.subheader("Full-Time Scoreline Probabilities")
-        for home_goals, away_goals, prob in sorted(ft_results, key=lambda x: x[2], reverse=True)[:10]:
-            st.write(f"FT {home_goals}-{away_goals}: {prob * 100:.2f}%")
-
-# Running the Streamlit app
+# Running the main function
 if __name__ == "__main__":
-    st.title("Football Match Prediction Tool")
     calculate_predictions()
