@@ -137,19 +137,75 @@ def calculate_predictions():
         st.write(f"🤝 **Draw Probability:** {draw_prob:.2f}%")
         st.write(f"📈 **Away Win Probability:** {away_win_prob:.2f}%")
         st.write(f"⚽ **Over 2.5 Goals Probability:** {over_2_5_prob:.2f}%")
-        st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.2f}%")
-        st.write(f"🔵 **BTTS GG Probability:** {btts_gg_prob:.2f}%")
-        st.write(f"🔴 **BTTS NG Probability:** {btts_ng_prob:.2f}%")
+        st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.3f}%")
+        st.write(f"🔄 **BTTS Probability (Yes):** {btts_prob:.5f}%")
+        
+        st.write(f"**Most Likely Halftime Correct Score:** {most_likely_scoreline_ht} - Probability: {most_likely_scoreline_prob_ht:.2f}%")
+        st.write(f"**Most Likely Full-time Correct Score:** {most_likely_scoreline_ft} - Probability: {most_likely_scoreline_prob_ft:.2f}%")
+        
+        # Multi-Scoreline
+        st.write("**Top 2 Halftime Correct Score Multi-Scoreline Probabilities**")
+        for scoreline, prob in sorted_ht_probs:
+            st.write(f"{scoreline}: {prob:.2f}%")
 
-        # Display HT/FT Predictions
-        st.write("🏆 **Top 2 HT/FT Predictions:**")
-        st.write(f"1. {sorted_ht_probs[0][0]} - {sorted_ht_probs[0][1]*100:.2f}%")
-        st.write(f"2. {sorted_ht_probs[1][0]} - {sorted_ht_probs[1][1]*100:.2f}%")
+        st.write("**Top 2 Full-time Correct Score Multi-Scoreline Probabilities**")
+        for scoreline, prob in sorted_ft_probs:
+            st.write(f"{scoreline}: {prob:.2f}%")
 
-        # Display Correct Score Predictions
-        st.write("🏁 **Top 2 Full-Time Predictions:**")
-        st.write(f"1. {sorted_ft_probs[0][0]} - {sorted_ft_probs[0][1]*100:.2f}%")
-        st.write(f"2. {sorted_ft_probs[1][0]} - {sorted_ft_probs[1][1]*100:.2f}%")
+        # HT/FT Predictions
+        st.write("**HT/FT Probabilities**")
+        for outcome, prob in ht_ft_probs.items():
+            st.write(f"{outcome}: {prob:.2f}%")
 
-if __name__ == "__main__":
-    calculate_predictions()
+        # Function to calculate HT/FT probabilities
+def calculate_ht_ft_probs(home_win_prob, draw_prob, away_win_prob):
+    """
+    Calculate the probabilities for all HT/FT outcomes.
+
+    Parameters:
+    - home_win_prob (float): Probability of a home win (in %)
+    - draw_prob (float): Probability of a draw (in %)
+    - away_win_prob (float): Probability of an away win (in %)
+
+    Returns:
+    - dict: A dictionary of HT/FT outcomes with their probabilities
+    """
+    ht_ft_probs = {
+        "1/1": home_win_prob * 4.24,
+        "1/X": home_win_prob * 4.43,
+        "1/2": home_win_prob * 18.08,
+        "X/1": draw_prob * 12.73,
+        "X/X": draw_prob * 6.64,
+        "X/2": draw_prob * 27.12,
+        "2/1": away_win_prob * 4.43,
+        "2/X": away_win_prob * 4.43,
+        "2/2": away_win_prob * 18.08,
+    }
+    return ht_ft_probs
+
+# Example input probabilities (replace these with your actual data)
+home_win_prob = 40.0  # Home win probability in percentage
+draw_prob = 30.0      # Draw probability in percentage
+away_win_prob = 30.0  # Away win probability in percentage
+
+# Validate inputs
+if home_win_prob + draw_prob + away_win_prob != 100.0:
+    raise ValueError("The probabilities must add up to 100%.")
+
+# Calculate HT/FT probabilities
+ht_ft_probs = calculate_ht_ft_probs(home_win_prob, draw_prob, away_win_prob)
+
+# Display HT/FT probabilities
+print("HT/FT Probabilities (in %):")
+for outcome, prob in ht_ft_probs.items():
+    print(f"{outcome}: {prob:.2f}%")
+# Identify the most likely HT/FT outcome
+most_likely_outcome = max(ht_ft_probs, key=ht_ft_probs.get)
+most_likely_prob = ht_ft_probs[most_likely_outcome]
+
+# Provide a recommendation
+print(f"\nRecommendation:")
+print(f"The most likely HT/FT outcome is '{most_likely_outcome}' with a probability of {most_likely_prob:.2f}%.\n")
+
+# Call the function to run the calculations
+calculate_predictions()
