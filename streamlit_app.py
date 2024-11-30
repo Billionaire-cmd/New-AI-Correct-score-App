@@ -69,18 +69,6 @@ def calculate_predictions():
     correct_score_margin = st.sidebar.number_input("Correct Score Margin", value=20.78, format="%.2f")
     ht_ft_margin = st.sidebar.number_input("HT/FT Margin", value=26.01, format="%.2f")
 
-   # Sidebar Predictions
-   st.sidebar.subheader("Select Predictions")
-   home_win = st.sidebar.checkbox("Home win")
-   draw_win = st.sidebar.checkbox("Draw win")
-   away_win = st.sidebar.checkbox("Away win")
-   over_2_5 = st.sidebar.checkbox("Over 2.5")
-   under_2_5 = st.sidebar.checkbox("Under 2.5")
-   correct_score = st.sidebar.checkbox("Correct score")
-   ht_ft = st.sidebar.checkbox("HT/FT")
-   exact_goals = st.sidebar.checkbox("Exact goals")
-   btts = st.sidebar.checkbox("Both teams to score (BTTS)")
-
 if st.sidebar.button("Submit Predictions"):
     # Poisson Probability Calculations
     home_goals_dist = poisson(home_expected_goals)
