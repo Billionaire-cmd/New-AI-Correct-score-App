@@ -57,7 +57,7 @@ def calculate_predictions():
 
         # Expected Goals Calculation
         home_expected_goals = st.sidebar.number_input("Home Team Expected Goals", value=1.28, format="%.2f")
-        away_expected_goals = st.sidebar.number_input("Away Team Expected Goals", value=2.96, format="%.2f")
+        away_expected_goals = st.sidebar.number_input("Away Team Expected Goals", value=2.27, format="%.2f")
 
         # Poisson Distributions for Full-time
         home_goals_dist = poisson(home_expected_goals)
