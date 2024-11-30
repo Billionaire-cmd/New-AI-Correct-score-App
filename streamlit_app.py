@@ -145,10 +145,6 @@ ht_ft = st.sidebar.checkbox("HT/FT")
 exact_goals = st.sidebar.checkbox("Exact goals")
 btts = st.sidebar.checkbox("Both teams to score (BTTS)")
 
-# Poisson Probability Calculations
-    home_goals_dist = poisson(home_expected_goals)
-    away_goals_dist = poisson(away_expected_goals)
-
     # Correct Score Probabilities
     correct_score_probs = {}
     for i in range(6):  # Home goals (0-5)
