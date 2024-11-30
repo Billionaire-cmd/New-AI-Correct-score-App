@@ -50,6 +50,11 @@ def calculate_predictions():
     away_attack = st.sidebar.number_input("Away Attack Strength", value=0.80, format="%.2f")
     away_defense = st.sidebar.number_input("Away Defense Strength", value=0.87, format="%.2f")
 
+if st.sidebar.button("Submit Predictions"):
+    # Poisson Probability Calculations
+    home_goals_dist = poisson(home_expected_goals)
+    away_goals_dist = poisson(away_expected_goals)
+
     st.sidebar.subheader("Expected Goals")
     home_expected_goals = st.sidebar.number_input("Home Team Expected Goals", value=1.30, format="%.2f")
     away_expected_goals = st.sidebar.number_input("Away Team Expected Goals", value=0.96, format="%.2f")
