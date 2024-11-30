@@ -204,5 +204,5 @@ if st.sidebar.button("Submit Predictions"):
     st.write(f"Recommended Half-Time Scoreline: HT {ht_home}-{ht_away} with Poisson Probability: {ht_prob * 100:.2f}%")
 
 # Main app
-st.title("🤖🤖🤖⚽⚽💯💯💯 Rabiotic Football Match Prediction using Poisson Distribution")
+st.title("🤖🤖🤖⚽⚽⚽💯💯💯 Rabiotic Football Match Prediction using Poisson Distribution")
 calculate_predictions()
