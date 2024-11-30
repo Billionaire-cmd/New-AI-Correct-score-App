@@ -49,7 +49,7 @@ def calculate_predictions():
     home_attack = st.sidebar.number_input("Home Attack Strength", value=2.39, format="%.2f")
     home_defense = st.sidebar.number_input("Home Defense Strength", value=0.56, format="%.2f")
     away_attack = st.sidebar.number_input("Away Attack Strength", value=1.20, format="%.f")
-    away_defense = st.sidebar.number_input("Away Defense Strength", value=1.33, format="%.2f")
+    away_defense = st.sidebar.number_input("Away Defense Strength", value=1.33, format="%.f")
 
     # Submit Button
     if st.sidebar.button("Submit Prediction"):
