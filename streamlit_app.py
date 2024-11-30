@@ -40,9 +40,10 @@ def calculate_predictions():
     over_2_5_odds = st.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.92)
     under_2_5_odds = st.number_input("Under 2.5 Goals Odds", min_value=1.0, value=1.90)
 
-    # BTTS GG/NG Odds
-    btts_gg_odds = st.sidebar.number_input("BTTS GG Odds (Both Teams to Score - Yes)", min_value=1.0, value=1.85)
-    btts_ng_odds = st.sidebar.number_input("BTTS NG Odds (Both Teams to Score - No)", min_value=1.0, value=1.95)
+    # Sidebar Inputs for BTTS (GG/NG) Odds
+    st.sidebar.subheader("BTTS (GG/NG) Odds")
+    btts_gg_odds = st.sidebar.number_input("BTTS GG Odds", min_value=1.0, value=1.80)
+    btts_ng_odds = st.sidebar.number_input("BTTS NG Odds", min_value=1.0, value=2.00)
 
     st.sidebar.header("Team Strengths")
     home_attack = st.sidebar.number_input("Home Attack Strength", value=1.00, format="%.2f")
@@ -100,7 +101,7 @@ def calculate_predictions():
             for i in range(1, 6) for j in range(1, 6)
         ) * 100
 
-        # BTTS GG and NG Odds Adjustments
+        # BTTS GG/NG ODDS Calculation
         btts_gg_prob = implied_prob(btts_gg_odds)
         btts_ng_prob = implied_prob(btts_ng_odds)
 
@@ -119,12 +120,12 @@ def calculate_predictions():
         st.write(f"⚽ **Over 2.5 Goals Probability:** {over_2_5_prob:.2f}%")
         st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.2f}%")
         st.write(f"🔄 **BTTS Probability (Yes):** {btts_prob:.2f}%")
+        
+        # BTTS GG/NG Odds Recommendation
+        st.write(f"**BTTS GG Odds Implied Probability:** {btts_gg_prob:.2f}%")
+        st.write(f"**BTTS NG Odds Implied Probability:** {btts_ng_prob:.2f}%")
 
-        # BTTS GG/NG Recommendation
-        st.sidebar.subheader("BTTS GG/NG Odds")
-        st.sidebar.write(f"GG Odds: {btts_gg_odds} -> Implied Probability: {btts_gg_prob:.2f}%")
-        st.sidebar.write(f"NG Odds: {btts_ng_odds} -> Implied Probability: {btts_ng_prob:.2f}%")
-
+        # BTTS Recommendation
         if btts_prob >= 50:
             st.write("🔔 **Recommendation: Both Teams to Score (BTTS) is likely!**")
         else:
@@ -144,6 +145,8 @@ def calculate_predictions():
         for score, prob in sorted(correct_score_probs.items(), key=lambda x: x[1], reverse=True)[:10]:
             st.write(f"{score}: {prob * 100:.2f}%")
 
-# Running the main function
-if __name__ == "__main__":
-    calculate_predictions()
+        st.subheader("Most Likely Outcome")
+        st.write(f"**The most likely scoreline is {most_likely_scoreline}** with a probability of {most_likely_scoreline_prob:.2f}%")
+
+# Call the function to run the calculations
+calculate_predictions()
