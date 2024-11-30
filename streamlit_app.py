@@ -144,7 +144,7 @@ correct_score = st.sidebar.checkbox("Correct score")
 ht_ft = st.sidebar.checkbox("HT/FT")
 exact_goals = st.sidebar.checkbox("Exact goals")
 btts = st.sidebar.checkbox("Both teams to score (BTTS)")
-[f"{i}-{j}"] = prob
+
 
     # Most Likely Scoreline
     most_likely_scoreline = max(correct_score_probs, key=correct_score_probs.get)
