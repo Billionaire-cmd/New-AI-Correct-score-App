@@ -10,76 +10,88 @@ def poisson_prob(lambda_rate, k):
 def implied_prob(odds):
     return 1 / odds * 100
 
-# Function to calculate probabilities for all scorelines
-def calculate_scoreline_probs(home_goals_dist, away_goals_dist, max_goals):
-    scoreline_probs = {}
-    for i in range(max_goals + 1):
-        for j in range(max_goals + 1):
-            prob = home_goals_dist.pmf(i) * away_goals_dist.pmf(j)
-            scoreline_probs[f"{i}-{j}"] = prob
-    return scoreline_probs
+# Function to generate all possible scorelines (for both HT and FT)
+def generate_scorelines(max_goals=5):
+    return [(home_goals, away_goals) for home_goals in range(max_goals + 1) for away_goals in range(max_goals + 1)]
 
-# Function to calculate probabilities for over/under 2.5 goals
-def calculate_over_under_probs(home_goals_dist, away_goals_dist, max_goals, threshold=2.5):
-    over_prob = sum(
-        home_goals_dist.pmf(i) * away_goals_dist.pmf(j)
-        for i in range(max_goals + 1) for j in range(max_goals + 1) if i + j > threshold
-    ) * 100
-    under_prob = 100 - over_prob
-    return over_prob, under_prob
+# Main function to calculate predictions and display results
+def calculate_predictions():
+    st.title("Football Match Prediction: Correct Scores and Probabilities")
 
-# Main app
-def main():
-    st.title("Football Match Outcome Predictor")
-
-    # Team Inputs
+    # Input Fields for Team Statistics
     st.subheader("Team Statistics")
-    team_a_name = st.text_input("Team A Name", "Home Team")
-    team_b_name = st.text_input("Team B Name", "Away Team")
-    team_a_avg_goals = st.number_input(f"{team_a_name} Average Goals Scored", min_value=0.0, value=1.5)
-    team_b_avg_goals = st.number_input(f"{team_b_name} Average Goals Scored", min_value=0.0, value=1.2)
-    team_a_conceded = st.number_input(f"{team_a_name} Average Goals Conceded", min_value=0.0, value=1.0)
-    team_b_conceded = st.number_input(f"{team_b_name} Average Goals Conceded", min_value=0.0, value=1.1)
+    team_a_goals = st.number_input("Team A Average Goals Scored", min_value=0.0, value=1.5)
+    team_b_goals = st.number_input("Team B Average Goals Scored", min_value=0.0, value=1.2)
+    team_a_conceded = st.number_input("Team A Average Goals Conceded", min_value=0.0, value=1.0)
+    team_b_conceded = st.number_input("Team B Average Goals Conceded", min_value=0.0, value=1.1)
 
-    # Maximum goals for scoreline calculation
-    max_goals = st.slider("Maximum Goals for Correct Scoreline Calculation", min_value=1, max_value=10, value=5)
-
-    # Odds Inputs
+    # Input Fields for Odds
     st.sidebar.subheader("Odds Inputs")
-    over_2_5_odds = st.sidebar.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.5)
-    under_2_5_odds = st.sidebar.number_input("Under 2.5 Goals Odds", min_value=1.0, value=2.5)
+    ft_home_odds = st.sidebar.number_input("Full-Time Home Win Odds", min_value=1.0, value=2.5)
+    ft_draw_odds = st.sidebar.number_input("Full-Time Draw Odds", min_value=1.0, value=3.2)
+    ft_away_odds = st.sidebar.number_input("Full-Time Away Win Odds", min_value=1.0, value=2.8)
+    over_2_5_odds = st.sidebar.number_input("Over 2.5 Goals Odds", min_value=1.0, value=1.8)
+    under_2_5_odds = st.sidebar.number_input("Under 2.5 Goals Odds", min_value=1.0, value=2.0)
 
-    # Expected Goals
-    home_expected_goals = team_a_avg_goals * (team_b_conceded / 1.5)
-    away_expected_goals = team_b_avg_goals * (team_a_conceded / 1.5)
+    # Expected Goals Calculation
+    home_expected_goals = team_a_goals * team_b_conceded
+    away_expected_goals = team_b_goals * team_a_conceded
 
-    # Calculate Poisson distributions
+    # Poisson Distribution
     home_goals_dist = poisson(home_expected_goals)
     away_goals_dist = poisson(away_expected_goals)
 
-    # Calculate correct score probabilities
-    scoreline_probs = calculate_scoreline_probs(home_goals_dist, away_goals_dist, max_goals)
+    # Generate Scorelines and Calculate Probabilities
+    scorelines = generate_scorelines()
+    correct_score_probs = {
+        f"{home}-{away}": home_goals_dist.pmf(home) * away_goals_dist.pmf(away)
+        for home, away in scorelines
+    }
 
-    # Calculate over/under 2.5 goals probabilities
-    over_2_5_prob, under_2_5_prob = calculate_over_under_probs(home_goals_dist, away_goals_dist, max_goals)
+    # Most Likely Scorelines
+    sorted_scores = sorted(correct_score_probs.items(), key=lambda x: x[1], reverse=True)
+    most_likely_score_ft = sorted_scores[0]
+
+    # Outcome Probabilities
+    home_win_prob = sum(
+        home_goals_dist.pmf(h) * sum(away_goals_dist.pmf(a) for a in range(h))
+        for h in range(6)
+    ) * 100
+    draw_prob = sum(
+        home_goals_dist.pmf(h) * away_goals_dist.pmf(h) for h in range(6)
+    ) * 100
+    away_win_prob = sum(
+        away_goals_dist.pmf(a) * sum(home_goals_dist.pmf(h) for h in range(a))
+        for a in range(6)
+    ) * 100
+
+    over_2_5_prob = sum(
+        home_goals_dist.pmf(h) * away_goals_dist.pmf(a)
+        for h in range(6) for a in range(6) if h + a > 2
+    ) * 100
+    under_2_5_prob = 100 - over_2_5_prob
+
+    # BTTS (Both Teams to Score) Probability
+    btts_prob = sum(
+        home_goals_dist.pmf(h) * away_goals_dist.pmf(a)
+        for h in range(1, 6) for a in range(1, 6)
+    ) * 100
 
     # Display Results
-    st.subheader("Predicted Probabilities")
-    st.write(f"**Expected Goals for {team_a_name}:** {home_expected_goals:.2f}")
-    st.write(f"**Expected Goals for {team_b_name}:** {away_expected_goals:.2f}")
-    st.write(f"**Over 2.5 Goals Probability:** {over_2_5_prob:.2f}%")
-    st.write(f"**Under 2.5 Goals Probability:** {under_2_5_prob:.2f}%")
+    st.subheader("Match Predictions")
+    st.write(f"🏠 **Home Win Probability:** {home_win_prob:.2f}%")
+    st.write(f"🤝 **Draw Probability:** {draw_prob:.2f}%")
+    st.write(f"📈 **Away Win Probability:** {away_win_prob:.2f}%")
+    st.write(f"⚽ **Over 2.5 Goals Probability:** {over_2_5_prob:.2f}%")
+    st.write(f"❌ **Under 2.5 Goals Probability:** {under_2_5_prob:.2f}%")
+    st.write(f"🔄 **BTTS Probability:** {btts_prob:.2f}%")
+    st.write(f"**Most Likely Full-Time Score:** {most_likely_score_ft[0]} with Probability: {most_likely_score_ft[1] * 100:.2f}%")
 
-    # Display correct score probabilities
-    st.subheader("Correct Score Probabilities")
-    scorelines = sorted(scoreline_probs.items(), key=lambda x: x[1], reverse=True)
-    for score, prob in scorelines[:10]:
-        st.write(f"{score}: {prob * 100:.2f}%")
+    # Display Top 5 Scorelines
+    st.subheader("Top 5 Likely Scorelines")
+    for score, prob in sorted_scores[:5]:
+        st.write(f"Scoreline {score}: {prob * 100:.2f}%")
 
-    # Display all scorelines in a table
-    st.write("**All Scoreline Probabilities**")
-    score_table = {score: f"{prob * 100:.2f}%" for score, prob in scoreline_probs.items()}
-    st.table(score_table)
-
+# Run the Application
 if __name__ == "__main__":
-    main()
+    calculate_predictions()
