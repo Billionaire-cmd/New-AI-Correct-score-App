@@ -198,12 +198,6 @@ if st.sidebar.button("Submit Predictions"):
     ht_home, ht_away, ht_prob = ht_recommended_score
     st.write(f"Recommended Half-Time Scoreline: HT {ht_home}-{ht_away} with Poisson Probability: {ht_prob * 100:.2f}%")
 
-# Add a submit button to the sidebar
-with st.sidebar:
-    st.markdown("### Submit Prediction")
-    if st.button("Submit Prediction"):
-        st.success("Prediction submitted! Results will be displayed below.")
-
 # Main app
 st.title("🤖🤖🤖⚽⚽💯💯💯 Rabiotic Football Match Prediction using Poisson Distribution")
 calculate_predictions()
