@@ -5,8 +5,3 @@ matplotlib==3.9.2
 scipy
 altair 
 scipy
-sklearn
-RandomForestClassifier
-scikit-learn
-seaborn
-requests
