@@ -134,7 +134,6 @@ exact_goals_margin = st.sidebar.number_input("Exact Goals Margin", value=19.56, 
 correct_score_margin = st.sidebar.number_input("Correct Score Margin", value=20.78, format="%.2f")
 ht_ft_margin = st.sidebar.number_input("HT/FT Margin", value=26.01, format="%.2f")
 
-Sidebar Predictions
 st.sidebar.subheader("Select Predictions")
 home_win = st.sidebar.checkbox("Home win")
 draw_win = st.sidebar.checkbox("Draw win")
