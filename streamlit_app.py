@@ -54,9 +54,8 @@ def calculate_predictions():
 with st.sidebar:
     st.markdown("### Submit Prediction")
     if st.button("Submit Prediction"): 
-     
         st.success("Prediction submitted! Results will be displayed below.")
-if st.sidebar.button("Submit Predictions"):
+
     # Poisson Probability Calculations
     home_goals_dist = poisson(home_expected_goals)
     away_goals_dist = poisson(away_expected_goals)
