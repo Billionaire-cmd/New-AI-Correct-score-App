@@ -59,20 +59,35 @@ def calculate_predictions():
         home_expected_goals = st.sidebar.number_input("Home Team Expected Goals", value=1.30, format="%.2f")
         away_expected_goals = st.sidebar.number_input("Away Team Expected Goals", value=0.96, format="%.2f")
 
-        # Poisson Distributions
+        # Poisson Distributions for Full-time
         home_goals_dist = poisson(home_expected_goals)
         away_goals_dist = poisson(away_expected_goals)
 
-        # Correct Score Probabilities
-        correct_score_probs = {}
+        # Poisson Distributions for Halftime (assuming half the expected goals for each team)
+        home_goals_dist_ht = poisson(home_expected_goals / 2)
+        away_goals_dist_ht = poisson(away_expected_goals / 2)
+
+        # Correct Score Probabilities for Full-time
+        correct_score_probs_ft = {}
         for i in range(6):  # Home goals (0-5)
             for j in range(6):  # Away goals (0-5)
                 prob = home_goals_dist.pmf(i) * away_goals_dist.pmf(j)
-                correct_score_probs[f"{i}-{j}"] = prob
+                correct_score_probs_ft[f"{i}-{j}"] = prob
 
-        # Most Likely Scoreline
-        most_likely_scoreline = max(correct_score_probs, key=correct_score_probs.get)
-        most_likely_scoreline_prob = correct_score_probs[most_likely_scoreline] * 100
+        # Correct Score Probabilities for Halftime
+        correct_score_probs_ht = {}
+        for i in range(6):  # Home goals (0-5)
+            for j in range(6):  # Away goals (0-5)
+                prob = home_goals_dist_ht.pmf(i) * away_goals_dist_ht.pmf(j)
+                correct_score_probs_ht[f"{i}-{j}"] = prob
+
+        # Most Likely Scoreline Full-time
+        most_likely_scoreline_ft = max(correct_score_probs_ft, key=correct_score_probs_ft.get)
+        most_likely_scoreline_prob_ft = correct_score_probs_ft[most_likely_scoreline_ft] * 100
+
+        # Most Likely Scoreline Halftime
+        most_likely_scoreline_ht = max(correct_score_probs_ht, key=correct_score_probs_ht.get)
+        most_likely_scoreline_prob_ht = correct_score_probs_ht[most_likely_scoreline_ht] * 100
 
         # Probabilities for Outcomes
         home_win_prob = sum(
@@ -125,28 +140,13 @@ def calculate_predictions():
         st.write(f"**BTTS GG Odds Implied Probability:** {btts_gg_prob:.2f}%")
         st.write(f"**BTTS NG Odds Implied Probability:** {btts_ng_prob:.2f}%")
 
-        # BTTS Recommendation
-        if btts_prob >= 50:
-            st.write("🔔 **Recommendation: Both Teams to Score (BTTS) is likely!**")
-        else:
-            st.write("🚫 **Recommendation: BTTS is unlikely!**")
+        st.write(f"**Most Likely Halftime Correct Score:** {most_likely_scoreline_ht} - Probability: {most_likely_scoreline_prob_ht:.2f}%")
+        st.write(f"**Most Likely Full-time Correct Score:** {most_likely_scoreline_ft} - Probability: {most_likely_scoreline_prob_ft:.2f}%")
 
-        # Over 2.5 Goals Recommendation
-        if over_2_5_prob >= 50:
-            st.write("🔔🔔 **Recommendation: Over 2.5 Goals is likely!**")
-        else:
-            st.write("🚫 **Recommendation: Under 2.5 Goals is likely!**")
-
-        st.subheader("HT/FT Probabilities")
-        for ht_ft, prob in ht_ft_probs.items():
-            st.write(f"{ht_ft}: {prob:.2f}%")
-
-        st.subheader("Correct Score Probabilities")
-        for score, prob in sorted(correct_score_probs.items(), key=lambda x: x[1], reverse=True)[:10]:
-            st.write(f"{score}: {prob * 100:.2f}%")
-
-        st.subheader("Most Likely Outcome")
-        st.write(f"**The most likely scoreline is {most_likely_scoreline}** with a probability of {most_likely_scoreline_prob:.2f}%")
+        # HT/FT Predictions
+        st.write("**HT/FT Probabilities**")
+        for outcome, prob in ht_ft_probs.items():
+            st.write(f"{outcome}: {prob:.2f}%")
 
 # Call the function to run the calculations
 calculate_predictions()
