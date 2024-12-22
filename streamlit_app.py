@@ -39,6 +39,12 @@ home_odds = st.sidebar.number_input("Full-Time Odds (Home Win)", min_value=1.0, 
 draw_odds = st.sidebar.number_input("Full-Time Odds (Draw)", min_value=1.0, value=3.0)
 away_odds = st.sidebar.number_input("Full-Time Odds (Away Win)", min_value=1.0, value=2.8)
 
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
 # Calculate attack and defense strengths
 attack_strength_a = avg_goals_a * (form_a / 100)
 attack_strength_b = avg_goals_b * (form_b / 100)
