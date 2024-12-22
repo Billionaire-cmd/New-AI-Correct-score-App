@@ -6,7 +6,7 @@ from scipy.stats import poisson
 st.set_page_config(page_title="Football Match Correct Score Predictor", layout="wide")
 
 # App title
-st.title("Football Match Correct Score Predictor")
+st.title("🤖🤖🤖💯Rabiotic Football Match Correct Score Predictor")
 st.write("This app predicts correct scores and provides detailed insights using statistics, league table data, and odds.")
 
 # Input form
@@ -75,6 +75,23 @@ most_likely_outcome = max(
     key=lambda x: x[1],
 )
 
+# Recommended correct score based on the most likely outcome
+if most_likely_outcome[0] == "Home Win":
+    recommended_score = max(
+        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i)],
+        key=lambda x: x[2],
+    )
+elif most_likely_outcome[0] == "Draw":
+    recommended_score = max(
+        [(i, i, prob_matrix[i, i]) for i in range(max_goals + 1)],
+        key=lambda x: x[2],
+    )
+else:  # Away Win
+    recommended_score = max(
+        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i + 1, max_goals + 1)],
+        key=lambda x: x[2],
+    )
+
 # Display match details
 st.write("### Match Details")
 st.write(f"**{team_a} vs {team_b}**")
@@ -94,6 +111,10 @@ st.write("### Correct Score Probabilities")
 for i in range(max_goals + 1):
     for j in range(max_goals + 1):
         st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
+
+# Recommended correct score
+st.write("### Recommended Correct Score")
+st.write(f"The recommended correct score is **{team_a} {recommended_score[0]} - {team_b} {recommended_score[1]}** with a probability of **{recommended_score[2] * 100:.2f}%**.")
 
 # Align scores with full-time probabilities
 st.write("### Aligned Scores with Outcomes")
