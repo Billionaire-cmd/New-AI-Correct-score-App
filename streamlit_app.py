@@ -36,6 +36,12 @@ team_a_avg_goals_conceded = (team_a_played * 2 - team_a_goal_diff) / team_a_play
 team_b_avg_goals_scored = team_b_goal_diff / team_b_played if team_b_played > 0 else 0
 team_b_avg_goals_conceded = (team_b_played * 2 - team_b_goal_diff) / team_b_played if team_b_played > 0 else 0
 
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
 # Display stats
 st.write(f"### League Table Stats for {team_a} vs {team_b}")
 st.write(f"- **{team_a}**: Played {team_a_played}, Wins {team_a_wins}, Draws {team_a_draws}, Losses {team_a_losses}, Goal Diff {team_a_goal_diff}, Points {team_a_points}")
