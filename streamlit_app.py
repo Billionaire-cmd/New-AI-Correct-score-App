@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import poisson
 
 # Title
-st.title("Football Match Correct Score Predictor")
+st.title("🤖🤖🤖💯Rabiotic Football Match Correct Score Predictor")
 st.subheader("Predict the correct score based on league table statistics")
 
 # Input League Table Data
