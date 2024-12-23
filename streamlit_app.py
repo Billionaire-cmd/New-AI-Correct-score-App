@@ -110,7 +110,7 @@ st.write("### Match Outcome Probabilities")
 st.write(f"- **Probability of Home Win**: {home_win_percentage:.2f}%")
 st.write(f"- **Probability of Draw**: {draw_percentage:.2f}%")
 st.write(f"- **Probability of Away Win**: {away_win_percentage:.2f}%")
-st.write(f"- **Most Likely Outcome**: {most_likely_outcome[0]} ({most_likely_outcome[2]:.2f}%)")
+st.write(f"- **Most Likely Outcome**: {most_likely_outcome[0]} ({most_likely_outcome[0]:.2f}%)")
 
 # Correct scores
 st.write("### Correct Score Probabilities")
@@ -120,7 +120,7 @@ for i in range(max_goals + 1):
 
 # Recommended correct score
 st.write("### Recommended Correct Score")
-st.write(f"The recommended correct score is **{team_a} {recommended_score[0]} - {team_b} {recommended_score[1]}** with a probability of **{recommended_score[2] * 100:.2f}%**.")
+st.write(f"The recommended correct score is **{team_a} {recommended_score[0]} - {team_b} {recommended_score[0]}** with a probability of **{recommended_score[2] * 100:.2f}%**.")
 
 # Align scores with full-time probabilities
 st.write("### Aligned Scores with Outcomes")
