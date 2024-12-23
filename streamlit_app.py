@@ -121,7 +121,7 @@ st.write("### Match Outcome Probabilities")
 st.write(f"- **Probability of Home Win**: {home_win_percentage:.2f}%")
 st.write(f"- **Probability of Draw**: {draw_percentage:.2f}%")
 st.write(f"- **Probability of Away Win**: {away_win_percentage:.2f}%")
-st.write(f"- **Most Likely Outcome**: {most_likely_outcome[1]} ({most_likely_outcome[2]:.2f}%)")
+st.write(f"- **Most Likely Outcome**: {most_likely_outcome[0]} ({most_likely_outcome[1]:.2f}%)")
 
 # Correct scores
 st.write("### Correct Score Probabilities")
