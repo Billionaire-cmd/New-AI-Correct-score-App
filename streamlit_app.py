@@ -46,7 +46,7 @@ with st.sidebar:
         st.success("Prediction submitted! Results will be displayed below.")
 
 # Calculate attack and defense strengths
-attack_strength_a = avg_goals_a * (form_a / 100)
+attack_strength_a = avg_goals_a * (form_a / 80)
 attack_strength_b = avg_goals_b * (form_b / 20)
 
 # Generate Poisson distribution probabilities
