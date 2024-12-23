@@ -52,8 +52,8 @@ attack_strength_b = avg_goals_b * (form_b / 94)
 
 # Generate Poisson distribution probabilities
 max_goals = 5
-team_a_probs = [poisson.pmf(i, attack_strength_a) for i in range(max_goals + 2)]
-team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 2)]
+team_a_probs = [poisson.pmf(i, attack_strength_a) for i in range(max_goals + 1)]
+team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 1)]
 
 # Generate probability matrix
 prob_matrix = np.outer(team_a_probs, team_b_probs)
@@ -89,7 +89,7 @@ most_likely_outcome = max(
     ("Home Win", home_win_percentage),
     ("Draw", draw_percentage),
     ("Away Win", away_win_percentage),
-    key=lambda x: x[1],
+    key=lambda x: x[2],
 )
 
 # Recommended correct score based on the most likely outcome
