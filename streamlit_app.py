@@ -6,7 +6,7 @@ from scipy.stats import poisson
 st.set_page_config(page_title="Football Match Correct Score Predictor", layout="wide")
 
 # App title
-st.title("Football Match Correct Score Predictor")
+st.title("🤖🤖🤖💯Rabiotic Football Match Correct Score Predictor")
 st.write("This app predicts correct scores and provides detailed insights using statistics, league table data, and odds.")
 
 # Input form
