@@ -24,9 +24,9 @@ draws_b = st.sidebar.number_input("Draws by Team B", min_value=0, value=2)
 losses_a = st.sidebar.number_input("Losses by Team A", min_value=0, value=2)
 losses_b = st.sidebar.number_input("Losses by Team B", min_value=0, value=2)
 goal_diff_a = st.sidebar.number_input("Goal Difference of Team A", value=10)
-goal_diff_b = st.sidebar.number_input("Goal Difference of Team B", value=8)
+goal_diff_b = st.sidebar.number_input("Goal Difference of Team B", value=-8)
 points_a = st.sidebar.number_input("Points of Team A", value=18)
-points_b = st.sidebar.number_input("Points of Team B", value=30)
+points_b = st.sidebar.number_input("Points of Team B", value=20)
 
 # Additional statistics
 avg_goals_a = st.sidebar.number_input("Average Goals Scored by Team A", min_value=0.0, value=1.5)
