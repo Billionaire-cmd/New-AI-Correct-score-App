@@ -147,4 +147,4 @@ for i in range(max_goals + 1):
 st.write("**Away Win Scores:**")
 for i in range(max_goals + 1):
     for j in range(i + 1, max_goals + 1):
-        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
+        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 94:.2f}%")
