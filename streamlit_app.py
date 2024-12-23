@@ -15,29 +15,29 @@ team_a = st.sidebar.text_input("Team A", value="Team A")
 team_b = st.sidebar.text_input("Team B", value="Team B")
 
 # League statistics
-matches_played_a = st.sidebar.number_input("Matches Played by Team A", min_value=0, value=10)
-matches_played_b = st.sidebar.number_input("Matches Played by Team B", min_value=0, value=10)
-wins_a = st.sidebar.number_input("Wins by Team A", min_value=0, value=5)
+matches_played_a = st.sidebar.number_input("Matches Played by Team A", min_value=0, value=15)
+matches_played_b = st.sidebar.number_input("Matches Played by Team B", min_value=0, value=16)
+wins_a = st.sidebar.number_input("Wins by Team A", min_value=0, value=9)
 wins_b = st.sidebar.number_input("Wins by Team B", min_value=0, value=6)
-draws_a = st.sidebar.number_input("Draws by Team A", min_value=0, value=3)
+draws_a = st.sidebar.number_input("Draws by Team A", min_value=0, value=4)
 draws_b = st.sidebar.number_input("Draws by Team B", min_value=0, value=2)
 losses_a = st.sidebar.number_input("Losses by Team A", min_value=0, value=2)
-losses_b = st.sidebar.number_input("Losses by Team B", min_value=0, value=2)
-goal_diff_a = st.sidebar.number_input("Goal Difference of Team A", value=10)
-goal_diff_b = st.sidebar.number_input("Goal Difference of Team B", value=8)
-points_a = st.sidebar.number_input("Points of Team A", value=18)
+losses_b = st.sidebar.number_input("Losses by Team B", min_value=0, value=8)
+goal_diff_a = st.sidebar.number_input("Goal Difference of Team A", value=17)
+goal_diff_b = st.sidebar.number_input("Goal Difference of Team B", value=-6)
+points_a = st.sidebar.number_input("Points of Team A", value=31)
 points_b = st.sidebar.number_input("Points of Team B", value=20)
 
 # Additional statistics
-avg_goals_a = st.sidebar.number_input("Average Goals Scored by Team A", min_value=0.0, value=1.5)
-avg_goals_b = st.sidebar.number_input("Average Goals Scored by Team B", min_value=0.0, value=1.8)
-form_a = st.sidebar.slider("Form Percentage of Team A", min_value=0, max_value=100, value=80)
-form_b = st.sidebar.slider("Form Percentage of Team B", min_value=0, max_value=100, value=20)
+avg_goals_a = st.sidebar.number_input("Average Goals Scored by Team A", min_value=0.0, value=1.6)
+avg_goals_b = st.sidebar.number_input("Average Goals Scored by Team B", min_value=0.0, value=1.1)
+form_a = st.sidebar.slider("Form Percentage of Team A", min_value=0, max_value=100, value=47)
+form_b = st.sidebar.slider("Form Percentage of Team B", min_value=0, max_value=100, value=27)
 
 # Full-time odds
-home_odds = st.sidebar.number_input("Full-Time Odds (Home Win)", min_value=1.0, value=2.5)
-draw_odds = st.sidebar.number_input("Full-Time Odds (Draw)", min_value=1.0, value=3.0)
-away_odds = st.sidebar.number_input("Full-Time Odds (Away Win)", min_value=1.0, value=2.8)
+home_odds = st.sidebar.number_input("Full-Time Odds (Home Win)", min_value=1.0, value=1.65)
+draw_odds = st.sidebar.number_input("Full-Time Odds (Draw)", min_value=1.0, value=4.23)
+away_odds = st.sidebar.number_input("Full-Time Odds (Away Win)", min_value=1.0, value=5.6)
 
 # Add a submit button to the sidebar
 with st.sidebar:
