@@ -46,13 +46,13 @@ with st.sidebar:
         st.success("Prediction submitted! Results will be displayed below.")
 
 # Calculate attack and defense strengths
-attack_strength_a = avg_goals_a * (form_a / 80)
-attack_strength_b = avg_goals_b * (form_b / 40)
+attack_strength_a = avg_goals_a * (form_a / 100)
+attack_strength_b = avg_goals_b * (form_b / 100)
 
 # Generate Poisson distribution probabilities
 max_goals = 5
 team_a_probs = [poisson.pmf(i, attack_strength_a) for i in range(max_goals + 1)]
-team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 2)]
+team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 3)]
 
 # Generate probability matrix
 prob_matrix = np.outer(team_a_probs, team_b_probs)
