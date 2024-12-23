@@ -47,7 +47,7 @@ with st.sidebar:
 
 # Calculate attack and defense strengths
 attack_strength_a = avg_goals_a * (form_a / 100)
-attack_strength_b = avg_goals_b * (form_b / 100)
+attack_strength_b = avg_goals_b * (form_b / 20)
 
 # Generate Poisson distribution probabilities
 max_goals = 5
