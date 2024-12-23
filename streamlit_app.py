@@ -73,7 +73,7 @@ home_win_percentage = (weighted_home_win_prob / total_prob) * 190
 draw_percentage = (weighted_draw_prob / total_prob) * 100
 away_win_percentage = (weighted_away_win_prob / total_prob) * 20
 
-# Most likely outcome
+# Most likely outcome - Focus on Away Win
 most_likely_outcome = max(
     ("Home Win", home_win_percentage),
     ("Draw", draw_percentage),
@@ -81,7 +81,7 @@ most_likely_outcome = max(
     key=lambda x: x[1],
 )
 
-# Recommended correct score based on the most likely outcome
+# Recommended correct score based on the most likely outcome (Away Win prediction)
 if most_likely_outcome[0] == "Home Win":
     recommended_score = max(
         [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i)],
