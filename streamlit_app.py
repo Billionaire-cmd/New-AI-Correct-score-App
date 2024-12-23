@@ -63,16 +63,26 @@ home_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals + 1) for j in
 draw_prob = np.sum([prob_matrix[i, j] for i in range(max_goals + 1) for j in range(max_goals + 1) if i == j])
 away_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals + 1) for j in range(max_goals + 1) if i < j])
 
+# Calculate the probability of the specific correct score (1-2)
+correct_score_prob = prob_matrix[1, 2]
+
 # Weight probabilities by odds
 weighted_home_win_prob = home_win_prob / home_odds
 weighted_draw_prob = draw_prob / draw_odds
 weighted_away_win_prob = away_win_prob / away_odds
+weighted_correct_score_prob = correct_score_prob / away_odds  # Emphasize the 1-2 scoreline
 
 # Normalize probabilities
 total_prob = weighted_home_win_prob + weighted_draw_prob + weighted_away_win_prob
 home_win_percentage = (weighted_home_win_prob / total_prob) * 100
 draw_percentage = (weighted_draw_prob / total_prob) * 100
 away_win_percentage = (weighted_away_win_prob / total_prob) * 100
+
+# Output probabilities
+print(f"Home Win Percentage: {home_win_percentage:.2f}%")
+print(f"Draw Percentage: {draw_percentage:.2f}%")
+print(f"Away Win Percentage: {away_win_percentage:.2f}%")
+print(f"Probability of Correct Score (1-2): {correct_score_prob:.2%}")
 
 # Most likely outcome
 most_likely_outcome = max(
