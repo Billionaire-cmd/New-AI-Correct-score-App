@@ -6,8 +6,8 @@ from scipy.stats import poisson
 st.set_page_config(page_title="Football Match Correct Score Predictor", layout="wide")
 
 # App title
-st.title("🤖🤖🤖💯Rabiotic Football Match Correct Score Predictor")
-st.write("This app predicts the correct score and provides detailed insights using statistics, league table data, and odds.")
+st.title("Football Match Correct Score Predictor")
+st.write("This app predicts correct scores and provides detailed insights using statistics, league table data, and odds.")
 
 # Input form
 st.sidebar.header("Input Match Details")
@@ -34,6 +34,7 @@ avg_goals_b = st.sidebar.number_input("Average Goals Scored by Team B", min_valu
 form_a = st.sidebar.slider("Form Percentage of Team A", min_value=0, max_value=100, value=47)
 form_b = st.sidebar.slider("Form Percentage of Team B", min_value=0, max_value=100, value=27)
 
+
 # Full-time odds
 home_odds = st.sidebar.number_input("Full-Time Odds (Home Win)", min_value=1.0, value=1.65)
 draw_odds = st.sidebar.number_input("Full-Time Odds (Draw)", min_value=1.0, value=4.23)
@@ -46,23 +47,57 @@ with st.sidebar:
         st.success("Prediction submitted! Results will be displayed below.")
 
 # Calculate attack and defense strengths
-attack_strength_a = avg_goals_a * (form_a / 20)
-attack_strength_b = avg_goals_b * (form_b / 190)
+attack_strength_a = avg_goals_a * (form_a / 100)
+attack_strength_b = avg_goals_b * (form_b / 100)
 
 # Generate Poisson distribution probabilities
 max_goals = 5
 team_a_probs = [poisson.pmf(i, attack_strength_a) for i in range(max_goals + 1)]
-team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 2)]
+team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 1)]
 
-# Generate probability for HT 1-0 and FT 1-2
-# HT: Team A 1 - Team B 0
-ht_prob = poisson.pmf(1, attack_strength_a) * poisson.pmf(0, attack_strength_b)
+# Generate probability matrix
+prob_matrix = np.outer(team_a_probs, team_b_probs)
 
-# FT: Team A 1 - Team B 2
-ft_prob = poisson.pmf(1, attack_strength_a) * poisson.pmf(2, attack_strength_b)
+# Calculate outcome probabilities
+home_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals + 1) for j in range(max_goals + 1) if i > j])
+draw_prob = np.sum([prob_matrix[i, j] for i in range(max_goals + 1) for j in range(max_goals + 1) if i == j])
+away_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals + 1) for j in range(max_goals + 1) if i < j])
 
-# Combined probability of HT 1-0 and FT 1-2
-combined_ht_ft_prob = ht_prob * ft_prob
+# Weight probabilities by odds
+weighted_home_win_prob = home_win_prob / home_odds
+weighted_draw_prob = draw_prob / draw_odds
+weighted_away_win_prob = away_win_prob / away_odds
+
+# Normalize probabilities
+total_prob = weighted_home_win_prob + weighted_draw_prob + weighted_away_win_prob
+home_win_percentage = (weighted_home_win_prob / total_prob) * 100
+draw_percentage = (weighted_draw_prob / total_prob) * 100
+away_win_percentage = (weighted_away_win_prob / total_prob) * 100
+
+# Most likely outcome
+most_likely_outcome = max(
+    ("Home Win", home_win_percentage),
+    ("Draw", draw_percentage),
+    ("Away Win", away_win_percentage),
+    key=lambda x: x[1],
+)
+
+# Recommended correct score based on the most likely outcome
+if most_likely_outcome[0] == "Home Win":
+    recommended_score = max(
+        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i)],
+        key=lambda x: x[2],
+    )
+elif most_likely_outcome[0] == "Draw":
+    recommended_score = max(
+        [(i, i, prob_matrix[i, i]) for i in range(max_goals + 1)],
+        key=lambda x: x[2],
+    )
+else:  # Away Win
+    recommended_score = max(
+        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i + 1, max_goals + 1)],
+        key=lambda x: x[2],
+    )
 
 # Display match details
 st.write("### Match Details")
@@ -71,21 +106,35 @@ st.write(f"- **Team A Form (%):** {form_a}")
 st.write(f"- **Team B Form (%):** {form_b}")
 st.write(f"- **Odds (Home - Draw - Away):** {home_odds} - {draw_odds} - {away_odds}")
 
-# Set fixed probabilities based on provided values
-home_win_prob = 24.12 / 100
-draw_win_prob = 21.29 / 100
-away_win_prob = 54.58 / 100
-
-# Display match outcome probabilities based on fixed percentages
+# Display probabilities
 st.write("### Match Outcome Probabilities")
-st.write(f"- **Probability of Home Win**: {home_win_prob * 100:.2f}%")
-st.write(f"- **Probability of Draw**: {draw_win_prob * 100:.2f}%")
-st.write(f"- **Probability of Away Win**: {away_win_prob * 100:.2f}%")
+st.write(f"- **Probability of Home Win**: {home_win_percentage:.2f}%")
+st.write(f"- **Probability of Draw**: {draw_percentage:.2f}%")
+st.write(f"- **Probability of Away Win**: {away_win_percentage:.2f}%")
+st.write(f"- **Most Likely Outcome**: {most_likely_outcome[0]} ({most_likely_outcome[1]:.2f}%)")
 
-# Display specific correct score A 1 - B 2 probability
-st.write("### Correct Score Probability")
-st.write(f"- The probability of the correct score **{team_a} 1 - {team_b} 2** is: **{combined_ht_ft_prob * 100:.2f}%**")
+# Correct scores
+st.write("### Correct Score Probabilities")
+for i in range(max_goals + 1):
+    for j in range(max_goals + 1):
+        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
 
-# Recommended correct score (HT/FT)
+# Recommended correct score
 st.write("### Recommended Correct Score")
-st.write(f"The recommended correct score is **{team_a} 1 - {team_b} 2** (HT 1-0, FT 1-2) with a probability of **{combined_ht_ft_prob * 100:.2f}%**.")
+st.write(f"The recommended correct score is **{team_a} {recommended_score[0]} - {team_b} {recommended_score[1]}** with a probability of **{recommended_score[2] * 100:.2f}%**.")
+
+# Align scores with full-time probabilities
+st.write("### Aligned Scores with Outcomes")
+st.write("**Home Win Scores:**")
+for i in range(max_goals + 1):
+    for j in range(i):
+        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
+
+st.write("**Draw Scores:**")
+for i in range(max_goals + 1):
+    st.write(f"{team_a} {i} - {team_b} {i}: {prob_matrix[i, i] * 100:.2f}%")
+
+st.write("**Away Win Scores:**")
+for i in range(max_goals + 1):
+    for j in range(i + 1, max_goals + 1):
+        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
