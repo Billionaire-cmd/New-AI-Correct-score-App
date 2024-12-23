@@ -78,7 +78,7 @@ most_likely_outcome = max(
     ("Home Win", home_win_percentage),
     ("Draw", draw_percentage),
     ("Away Win", away_win_percentage),
-    key=lambda x: x[1],
+    key=lambda x: x[2],
 )
 
 # Recommended correct score based on the most likely outcome
