@@ -47,7 +47,7 @@ with st.sidebar:
 
 # Calculate attack and defense strengths
 attack_strength_a = avg_goals_a * (form_a / 100)
-attack_strength_b = avg_goals_b * (form_b / 30)
+attack_strength_b = avg_goals_b * (form_b / 20)
 
 # Generate Poisson distribution probabilities
 max_goals = 5
@@ -71,7 +71,7 @@ weighted_away_win_prob = away_win_prob / away_odds
 total_prob = weighted_home_win_prob + weighted_draw_prob + weighted_away_win_prob
 home_win_percentage = (weighted_home_win_prob / total_prob) * 100
 draw_percentage = (weighted_draw_prob / total_prob) * 100
-away_win_percentage = (weighted_away_win_prob / total_prob) * 30
+away_win_percentage = (weighted_away_win_prob / total_prob) * 100
 
 # Most likely outcome
 most_likely_outcome = max(
