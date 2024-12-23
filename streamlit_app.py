@@ -31,8 +31,8 @@ points_b = st.sidebar.number_input("Points of Team B", value=20)
 # Additional statistics
 avg_goals_a = st.sidebar.number_input("Average Goals Scored by Team A", min_value=0.0, value=1.5)
 avg_goals_b = st.sidebar.number_input("Average Goals Scored by Team B", min_value=0.0, value=1.8)
-form_a = st.sidebar.slider("Form Percentage of Team A", min_value=0, max_value=100, value=47)
-form_b = st.sidebar.slider("Form Percentage of Team B", min_value=0, max_value=100, value=27)
+form_a = st.sidebar.slider("Form Percentage of Team A", min_value=0, max_value=100, value=70)
+form_b = st.sidebar.slider("Form Percentage of Team B", min_value=0, max_value=100, value=80)
 
 # Full-time odds
 home_odds = st.sidebar.number_input("Full-Time Odds (Home Win)", min_value=1.0, value=2.5)
@@ -46,7 +46,7 @@ with st.sidebar:
         st.success("Prediction submitted! Results will be displayed below.")
 
 # Calculate attack and defense strengths
-attack_strength_a = avg_goals_a * (form_a / 100)
+attack_strength_a = avg_goals_a * (form_a / 80)
 attack_strength_b = avg_goals_b * (form_b / 100)
 
 # Generate Poisson distribution probabilities
