@@ -26,7 +26,7 @@ losses_b = st.sidebar.number_input("Losses by Team B", min_value=0, value=2)
 goal_diff_a = st.sidebar.number_input("Goal Difference of Team A", value=10)
 goal_diff_b = st.sidebar.number_input("Goal Difference of Team B", value=8)
 points_a = st.sidebar.number_input("Points of Team A", value=18)
-points_b = st.sidebar.number_input("Points of Team B", value=20)
+points_b = st.sidebar.number_input("Points of Team B", value=30)
 
 # Additional statistics
 avg_goals_a = st.sidebar.number_input("Average Goals Scored by Team A", min_value=0.0, value=1.5)
@@ -47,7 +47,7 @@ with st.sidebar:
 
 # Calculate attack and defense strengths
 attack_strength_a = avg_goals_a * (form_a / 100)
-attack_strength_b = avg_goals_b * (form_b / 20)
+attack_strength_b = avg_goals_b * (form_b / 30)
 
 # Generate Poisson distribution probabilities
 max_goals = 5
