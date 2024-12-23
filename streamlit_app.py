@@ -69,9 +69,9 @@ weighted_away_win_prob = away_win_prob / away_odds
 
 # Normalize probabilities
 total_prob = weighted_home_win_prob + weighted_draw_prob + weighted_away_win_prob
-home_win_percentage = (weighted_home_win_prob / total_prob) * 100
+home_win_percentage = (weighted_home_win_prob / total_prob) * 190
 draw_percentage = (weighted_draw_prob / total_prob) * 100
-away_win_percentage = (weighted_away_win_prob / total_prob) * 50
+away_win_percentage = (weighted_away_win_prob / total_prob) * 20
 
 # Most likely outcome
 most_likely_outcome = max(
