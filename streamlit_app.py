@@ -78,23 +78,23 @@ most_likely_outcome = max(
     ("Home Win", home_win_percentage),
     ("Draw", draw_percentage),
     ("Away Win", away_win_percentage),
-    key=lambda x: x[1],
+    key=lambda x: x[2],
 )
 
 # Recommended correct score based on the most likely outcome
 if most_likely_outcome[0] == "Home Win":
     recommended_score = max(
-        [(i, j, prob_matrix[i, j]) for i in range(max_goals - 2) for j in range(i)],
+        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i)],
         key=lambda x: x[2],
     )
 elif most_likely_outcome[0] == "Draw":
     recommended_score = max(
-        [(i, i, prob_matrix[i, i]) for i in range(max_goals - 2)],
+        [(i, i, prob_matrix[i, i]) for i in range(max_goals + 1)],
         key=lambda x: x[2],
     )
 else:  # Away Win
     recommended_score = max(
-        [(i, j, prob_matrix[i, j]) for i in range(max_goals - 2) for j in range(i - 1, max_goals + 1)],
+        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i - 1, max_goals + 1)],
         key=lambda x: x[2],
     )
 
