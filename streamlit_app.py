@@ -54,8 +54,15 @@ max_goals = 5
 team_a_probs = [poisson.pmf(i, attack_strength_a) for i in range(max_goals + 1)]
 team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 2)]
 
-# Generate probability for correct score A 1 - B 2
-a_1_b_2_prob = poisson.pmf(1, attack_strength_a) * poisson.pmf(2, attack_strength_b)
+# Generate probability for HT 1-0 and FT 1-2
+# HT: Team A 1 - Team B 0
+ht_prob = poisson.pmf(1, attack_strength_a) * poisson.pmf(0, attack_strength_b)
+
+# FT: Team A 1 - Team B 2
+ft_prob = poisson.pmf(1, attack_strength_a) * poisson.pmf(2, attack_strength_b)
+
+# Combined probability of HT 1-0 and FT 1-2
+combined_ht_ft_prob = ht_prob * ft_prob
 
 # Display match details
 st.write("### Match Details")
@@ -72,8 +79,8 @@ st.write(f"- **Probability of Away Win**: {away_odds:.2f}")
 
 # Display specific correct score A 1 - B 2 probability
 st.write("### Correct Score Probability")
-st.write(f"- The probability of the correct score **{team_a} 1 - {team_b} 2** is: **{a_1_b_2_prob * 100:.2f}%**")
+st.write(f"- The probability of the correct score **{team_a} 1 - {team_b} 2** is: **{combined_ht_ft_prob * 100:.2f}%**")
 
-# Recommended correct score
+# Recommended correct score (HT/FT)
 st.write("### Recommended Correct Score")
-st.write(f"The recommended correct score is **{team_a} 1 - {team_b} 2** with a probability of **{a_1_b_2_prob * 100:.2f}%**.")
+st.write(f"The recommended correct score is **{team_a} 1 - {team_b} 2** (HT 1-0, FT 1-2) with a probability of **{combined_ht_ft_prob * 100:.2f}%**.")
