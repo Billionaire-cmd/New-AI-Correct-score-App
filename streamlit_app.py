@@ -32,7 +32,7 @@ points_b = st.sidebar.number_input("Points of Team B", value=20)
 avg_goals_a = st.sidebar.number_input("Average Goals Scored by Team A", min_value=0.0, value=1.5)
 avg_goals_b = st.sidebar.number_input("Average Goals Scored by Team B", min_value=0.0, value=1.8)
 form_a = st.sidebar.slider("Form Percentage of Team A", min_value=0, max_value=100, value=80)
-form_b = st.sidebar.slider("Form Percentage of Team B", min_value=0, max_value=100, value=20)
+form_b = st.sidebar.slider("Form Percentage of Team B", min_value=0, max_value=100, value=30)
 
 # Full-time odds
 home_odds = st.sidebar.number_input("Full-Time Odds (Home Win)", min_value=1.0, value=2.5)
