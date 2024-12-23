@@ -58,9 +58,9 @@ team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 2)]
 prob_matrix = np.outer(team_a_probs, team_b_probs)
 
 # Calculate outcome probabilities
-home_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals - 2) for j in range(max_goals + 1) if i > j])
+home_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals - 2) for j in range(max_goals + 1) if i == j])
 draw_prob = np.sum([prob_matrix[i, j] for i in range(max_goals - 2) for j in range(max_goals - 1) if i < j])
-away_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals - 2) for j in range(max_goals - 1) if i == j])
+away_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals - 2) for j in range(max_goals - 1) if i > j])
 
 # Weight probabilities by odds
 weighted_home_win_prob = home_win_prob / home_odds
