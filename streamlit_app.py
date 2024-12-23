@@ -93,9 +93,9 @@ most_likely_outcome = max(
 )
 
 # Recommended correct score based on the most likely outcome
-if most_likely_outcome[0] == "Home Win":
+if most_likely_outcome[1] == "Home Win":
     recommended_score = max(
-        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i)],
+        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 2) for j in range(i)],
         key=lambda x: x[2],
     )
 elif most_likely_outcome[0] == "Draw":
