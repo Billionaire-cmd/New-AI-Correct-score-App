@@ -7,7 +7,7 @@ st.set_page_config(page_title="Football Match Correct Score Predictor", layout="
 
 # App title
 st.title("🤖🤖🤖💯Rabiotic Football Match Correct Score Predictor")
-st.write("This app predicts correct scores and provides detailed insights using statistics, league table data, and odds.")
+st.write("This app predicts the correct score and provides detailed insights using statistics, league table data, and odds.")
 
 # Input form
 st.sidebar.header("Input Match Details")
@@ -54,49 +54,8 @@ max_goals = 5
 team_a_probs = [poisson.pmf(i, attack_strength_a) for i in range(max_goals + 1)]
 team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 2)]
 
-# Generate probability matrix
-prob_matrix = np.outer(team_a_probs, team_b_probs)
-
-# Calculate outcome probabilities
-home_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals - 2) for j in range(max_goals + 1) if i < j])
-draw_prob = np.sum([prob_matrix[i, j] for i in range(max_goals - 2) for j in range(max_goals - 1) if i == j])
-away_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals - 2) for j in range(max_goals - 1) if i > j])
-
-# Weight probabilities by odds
-weighted_home_win_prob = home_win_prob / home_odds
-weighted_draw_prob = draw_prob / draw_odds
-weighted_away_win_prob = away_win_prob / away_odds
-
-# Normalize probabilities
-total_prob = weighted_home_win_prob + weighted_draw_prob + weighted_away_win_prob
-home_win_percentage = (weighted_home_win_prob / total_prob) * 190
-draw_percentage = (weighted_draw_prob / total_prob) * 100
-away_win_percentage = (weighted_away_win_prob / total_prob) * 20
-
-# Most likely outcome - Focus on Away Win
-most_likely_outcome = max(
-    ("Home Win", home_win_percentage),
-    ("Draw", draw_percentage),
-    ("Away Win", away_win_percentage),
-    key=lambda x: x[1],
-)
-
-# Recommended correct score based on the most likely outcome (Away Win prediction)
-if most_likely_outcome[0] == "Home Win":
-    recommended_score = max(
-        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i)],
-        key=lambda x: x[2],
-    )
-elif most_likely_outcome[0] == "Draw":
-    recommended_score = max(
-        [(i, i, prob_matrix[i, i]) for i in range(max_goals + 1)],
-        key=lambda x: x[2],
-    )
-else:  # Away Win
-    recommended_score = max(
-        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i - 1, max_goals + 1)],
-        key=lambda x: x[2],
-    )
+# Generate probability for correct score A 1 - B 2
+a_1_b_2_prob = poisson.pmf(1, attack_strength_a) * poisson.pmf(2, attack_strength_b)
 
 # Display match details
 st.write("### Match Details")
@@ -107,33 +66,14 @@ st.write(f"- **Odds (Home - Draw - Away):** {home_odds} - {draw_odds} - {away_od
 
 # Display probabilities
 st.write("### Match Outcome Probabilities")
-st.write(f"- **Probability of Home Win**: {home_win_percentage:.2f}%")
-st.write(f"- **Probability of Draw**: {draw_percentage:.2f}%")
-st.write(f"- **Probability of Away Win**: {away_win_percentage:.2f}%")
-st.write(f"- **Most Likely Outcome**: {most_likely_outcome[0]} ({most_likely_outcome[1]:.2f}%)")
+st.write(f"- **Probability of Home Win**: {home_odds:.2f}")
+st.write(f"- **Probability of Draw**: {draw_odds:.2f}")
+st.write(f"- **Probability of Away Win**: {away_odds:.2f}")
 
-# Correct scores
-st.write("### Correct Score Probabilities")
-for i in range(max_goals + 1):
-    for j in range(max_goals + 1):
-        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
+# Display specific correct score A 1 - B 2 probability
+st.write("### Correct Score Probability")
+st.write(f"- The probability of the correct score **{team_a} 1 - {team_b} 2** is: **{a_1_b_2_prob * 100:.2f}%**")
 
 # Recommended correct score
 st.write("### Recommended Correct Score")
-st.write(f"The recommended correct score is **{team_a} {recommended_score[0]} - {team_b} {recommended_score[1]}** with a probability of **{recommended_score[2] * 100:.2f}%**.")
-
-# Align scores with full-time probabilities
-st.write("### Aligned Scores with Outcomes")
-st.write("**Home Win Scores:**")
-for i in range(max_goals - 2):
-    for j in range(i):
-        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
-
-st.write("**Draw Scores:**")
-for i in range(max_goals - 2):
-    st.write(f"{team_a} {i} - {team_b} {i}: {prob_matrix[i, i] * 100:.2f}%")
-
-st.write("**Away Win Scores:**")
-for i in range(max_goals - 2):
-    for j in range(i - 1, max_goals + 1):
-        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
+st.write(f"The recommended correct score is **{team_a} 1 - {team_b} 2** with a probability of **{a_1_b_2_prob * 100:.2f}%**.")
