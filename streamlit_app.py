@@ -47,11 +47,11 @@ with st.sidebar:
 
 # Calculate attack and defense strengths
 attack_strength_a = avg_goals_a * (form_a / 80)
-attack_strength_b = avg_goals_b * (form_b / 80)
+attack_strength_b = avg_goals_b * (form_b / 20)
 
 # Generate Poisson distribution probabilities
 max_goals = 5
-team_a_probs = [poisson.pmf(i, attack_strength_a) for i in range(max_goals + 2)]
+team_a_probs = [poisson.pmf(i, attack_strength_a) for i in range(max_goals + 1)]
 team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 2)]
 
 # Generate probability matrix
