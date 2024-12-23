@@ -24,7 +24,7 @@ draws_b = st.sidebar.number_input("Draws by Team B", min_value=0, value=2)
 losses_a = st.sidebar.number_input("Losses by Team A", min_value=0, value=2)
 losses_b = st.sidebar.number_input("Losses by Team B", min_value=0, value=2)
 goal_diff_a = st.sidebar.number_input("Goal Difference of Team A", value=10)
-goal_diff_b = st.sidebar.number_input("Goal Difference of Team B", value=-8)
+goal_diff_b = st.sidebar.number_input("Goal Difference of Team B", value=8)
 points_a = st.sidebar.number_input("Points of Team A", value=18)
 points_b = st.sidebar.number_input("Points of Team B", value=20)
 
@@ -71,7 +71,7 @@ weighted_away_win_prob = away_win_prob / away_odds
 total_prob = weighted_home_win_prob + weighted_draw_prob + weighted_away_win_prob
 home_win_percentage = (weighted_home_win_prob / total_prob) * 100
 draw_percentage = (weighted_draw_prob / total_prob) * 100
-away_win_percentage = (weighted_away_win_prob / total_prob) * 100
+away_win_percentage = (weighted_away_win_prob / total_prob) * 30
 
 # Most likely outcome
 most_likely_outcome = max(
