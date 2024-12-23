@@ -39,6 +39,9 @@ home_odds = st.sidebar.number_input("Full-Time Odds (Home Win)", min_value=1.0, 
 draw_odds = st.sidebar.number_input("Full-Time Odds (Draw)", min_value=1.0, value=4.23)
 away_odds = st.sidebar.number_input("Full-Time Odds (Away Win)", min_value=1.0, value=5.6)
 
+# Bias factor for away team (percentage)
+bias_percentage = st.sidebar.slider("Bias Percentage for Away Team", min_value=0, max_value=100, value=20) / 100  # Bias factor
+
 # Add a submit button to the sidebar
 with st.sidebar:
     st.markdown("### Submit Prediction")
@@ -64,6 +67,22 @@ ft_prob = poisson.pmf(1, attack_strength_a) * poisson.pmf(2, attack_strength_b)
 # Combined probability of HT 1-0 and FT 1-2
 combined_ht_ft_prob = ht_prob * ft_prob
 
+# Apply bias to away odds
+biased_away_odds = away_odds * (1 - bias_percentage)
+biased_home_odds = home_odds * (1 + bias_percentage)  # Home odds can be slightly reduced in case of bias
+biased_draw_odds = draw_odds * (1 + bias_percentage)  # Adjust draw odds if needed
+
+# Convert biased odds into probabilities
+biased_home_prob = 1 / biased_home_odds
+biased_draw_prob = 1 / biased_draw_odds
+biased_away_prob = 1 / biased_away_odds
+
+# Normalize the probabilities (ensure they sum to 1)
+total_prob = biased_home_prob + biased_draw_prob + biased_away_prob
+biased_home_prob /= total_prob
+biased_draw_prob /= total_prob
+biased_away_prob /= total_prob
+
 # Display match details
 st.write("### Match Details")
 st.write(f"**{team_a} vs {team_b}**")
@@ -73,9 +92,9 @@ st.write(f"- **Odds (Home - Draw - Away):** {home_odds} - {draw_odds} - {away_od
 
 # Display probabilities
 st.write("### Match Outcome Probabilities")
-st.write(f"- **Probability of Home Win**: {home_odds:.2f}")
-st.write(f"- **Probability of Draw**: {draw_odds:.2f}")
-st.write(f"- **Probability of Away Win**: {away_odds:.2f}")
+st.write(f"- **Biased Probability of Home Win**: {biased_home_prob * 100:.2f}%")
+st.write(f"- **Biased Probability of Draw**: {biased_draw_prob * 100:.2f}%")
+st.write(f"- **Biased Probability of Away Win**: {biased_away_prob * 100:.2f}%")
 
 # Display specific correct score A 1 - B 2 probability
 st.write("### Correct Score Probability")
