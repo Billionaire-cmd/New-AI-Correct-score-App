@@ -94,7 +94,7 @@ elif most_likely_outcome[0] == "Draw":
     )
 else:  # Away Win
     recommended_score = max(
-        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i + 1, max_goals + 1)],
+        [(i, j, prob_matrix[i, j]) for i in range(max_goals - 2) for j in range(i - 1, max_goals + 1)],
         key=lambda x: x[2],
     )
 
@@ -125,15 +125,15 @@ st.write(f"The recommended correct score is **{team_a} {recommended_score[0]} - 
 # Align scores with full-time probabilities
 st.write("### Aligned Scores with Outcomes")
 st.write("**Home Win Scores:**")
-for i in range(max_goals + 1):
+for i in range(max_goals - 2):
     for j in range(i):
         st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
 
 st.write("**Draw Scores:**")
-for i in range(max_goals + 1):
+for i in range(max_goals - 2):
     st.write(f"{team_a} {i} - {team_b} {i}: {prob_matrix[i, i] * 100:.2f}%")
 
 st.write("**Away Win Scores:**")
-for i in range(max_goals + 1):
-    for j in range(i + 1, max_goals + 1):
+for i in range(max_goals - 2):
+    for j in range(i - 1, max_goals + 1):
         st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
