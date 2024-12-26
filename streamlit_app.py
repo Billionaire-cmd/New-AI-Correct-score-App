@@ -47,8 +47,8 @@ with st.sidebar:
         st.success("Prediction submitted! Results will be displayed below.")
 
 # Calculate attack and defense strengths
-attack_strength_a = avg_goals_a * (form_a / 47)
-attack_strength_b = avg_goals_b * (form_b / 94)
+attack_strength_a = avg_goals_a * (form_a / 94)
+attack_strength_b = avg_goals_b * (form_b / 188)
 
 # Generate Poisson distribution probabilities
 max_goals = 5
@@ -74,9 +74,9 @@ weighted_correct_score_prob = correct_score_prob / away_odds  # Emphasize the 1-
 
 # Normalize probabilities
 total_prob = weighted_home_win_prob + weighted_draw_prob + weighted_away_win_prob
-home_win_percentage = (weighted_home_win_prob / total_prob) * 47
+home_win_percentage = (weighted_home_win_prob / total_prob) * 100
 draw_percentage = (weighted_draw_prob / total_prob) * 100
-away_win_percentage = (weighted_away_win_prob / total_prob) * 94
+away_win_percentage = (weighted_away_win_prob / total_prob) * 100
 
 # Output probabilities
 print(f"Home Win Percentage: {home_win_percentage:.2f}%")
