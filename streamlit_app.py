@@ -82,7 +82,7 @@ away_win_percentage = (weighted_away_win_prob / total_prob) * 100
 print(f"Home Win Percentage: {home_win_percentage:.2f}%")
 print(f"Draw Percentage: {draw_percentage:.2f}%")
 print(f"Away Win Percentage: {away_win_percentage:.2f}%")
-print(f"Probability of Correct Score (1-2): {correct_score_prob:.2%}")
+print(f"Probability of Correct Score (2-3): {correct_score_prob:.2%}")
 
 # Most likely outcome
 most_likely_outcome = max(
