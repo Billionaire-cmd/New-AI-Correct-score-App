@@ -103,11 +103,33 @@ st.write(f"Expected Value for Both Teams Not to Score (NG): **{ev_btts_ng:.2f}**
 
 # Final recommendation
 st.subheader("Final Recommendation")
+
+# Filter most likely score based on the match result condition
+def get_most_likely_score(condition):
+    filtered_scores = {
+        "home_win": [(i, j, score_matrix[i, j]) for i in range(max_goals + 1) for j in range(max_goals + 1) if i > j],
+        "draw": [(i, j, score_matrix[i, j]) for i in range(max_goals + 1) for j in range(max_goals + 1) if i == j],
+        "away_win": [(i, j, score_matrix[i, j]) for i in range(max_goals + 1) for j in range(max_goals + 1) if i < j],
+    }
+    scores = filtered_scores[condition]
+    if scores:
+        return max(scores, key=lambda x: x[2])[:2]  # Return the score with the highest probability
+    else:
+        return None  # No valid scores
+
+# Determine final recommendation based on expected value
 final_recommendation = "No clear value bet detected."
 if ev_home > 0:
-    final_recommendation = f"Value Bet Recommendation: **Home Win** with Correct Score **{most_likely_score[0]}-{most_likely_score[1]}**"
+    likely_score = get_most_likely_score("home_win")
+    if likely_score:
+        final_recommendation = f"Value Bet Recommendation: **Home Win** with Correct Score **{likely_score[0]}-{likely_score[1]}**"
 elif ev_draw > 0:
-    final_recommendation = f"Value Bet Recommendation: **Draw** with Correct Score **{most_likely_score[0]}-{most_likely_score[1]}**"
+    likely_score = get_most_likely_score("draw")
+    if likely_score:
+        final_recommendation = f"Value Bet Recommendation: **Draw** with Correct Score **{likely_score[0]}-{likely_score[1]}**"
 elif ev_away > 0:
-    final_recommendation = f"Value Bet Recommendation: **Away Win** with Correct Score **{most_likely_score[0]}-{most_likely_score[1]}**"
+    likely_score = get_most_likely_score("away_win")
+    if likely_score:
+        final_recommendation = f"Value Bet Recommendation: **Away Win** with Correct Score **{likely_score[0]}-{likely_score[1]}**"
+
 st.write(final_recommendation)
