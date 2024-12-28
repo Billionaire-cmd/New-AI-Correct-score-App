@@ -1,150 +1,113 @@
 import streamlit as st
 import numpy as np
+import pandas as pd
 from scipy.stats import poisson
 
-# Set page title
-st.set_page_config(page_title="Football Match Correct Score Predictor", layout="wide")
+# Title
+st.title("🤖🤖🤖⚽💯Rabiotic Football Match Real Correct Score Predictor")
 
-# App title
-st.title("🤖🤖🤖💯Rabiotic Football Match Correct Score Predictor")
-st.write("This app predicts correct scores and provides detailed insights using statistics, league table data, and odds.")
+# Input parameters
+st.header("Team Statistics")
+avg_goals_A = st.number_input("Average Goals Scored by Team A (e.g., 1.3)", value=1.3)
+avg_goals_B = st.number_input("Average Goals Scored by Team B (e.g., 1.7)", value=1.7)
+max_goals = st.slider("Maximum Goals to Consider (e.g., 5)", min_value=1, max_value=10, value=5)
 
-# Input form
-st.sidebar.header("Input Match Details")
-team_a = st.sidebar.text_input("Team A", value="Team A")
-team_b = st.sidebar.text_input("Team B", value="Team B")
+st.header("Odds Information")
+odds_home = st.number_input("Odds for Home Win", value=2.5)
+odds_draw = st.number_input("Odds for Draw", value=3.2)
+odds_away = st.number_input("Odds for Away Win", value=2.8)
+odds_over_1_5 = st.number_input("Odds for Over 1.5 Goals", value=1.5)
+odds_under_1_5 = st.number_input("Odds for Under 1.5 Goals", value=2.6)
+odds_over_2_5 = st.number_input("Odds for Over 2.5 Goals", value=1.9)
+odds_under_2_5 = st.number_input("Odds for Under 2.5 Goals", value=1.8)
+odds_btts_gg = st.number_input("Odds for Both Teams to Score (GG)", value=1.8)
+odds_btts_ng = st.number_input("Odds for Both Teams Not to Score (NG)", value=2.0)
 
-# League statistics
-matches_played_a = st.sidebar.number_input("Matches Played by Team A", min_value=0, value=15)
-matches_played_b = st.sidebar.number_input("Matches Played by Team B", min_value=0, value=16)
-wins_a = st.sidebar.number_input("Wins by Team A", min_value=0, value=9)
-wins_b = st.sidebar.number_input("Wins by Team B", min_value=0, value=6)
-draws_a = st.sidebar.number_input("Draws by Team A", min_value=0, value=4)
-draws_b = st.sidebar.number_input("Draws by Team B", min_value=0, value=2)
-losses_a = st.sidebar.number_input("Losses by Team A", min_value=0, value=2)
-losses_b = st.sidebar.number_input("Losses by Team B", min_value=0, value=8)
-goal_diff_a = st.sidebar.number_input("Goal Difference of Team A", value=17)
-goal_diff_b = st.sidebar.number_input("Goal Difference of Team B", value=-6)
-points_a = st.sidebar.number_input("Points of Team A", value=31)
-points_b = st.sidebar.number_input("Points of Team B", value=20)
-
-# Additional statistics
-avg_goals_a = st.sidebar.number_input("Average Goals Scored by Team A", min_value=0.0, value=1.6)
-avg_goals_b = st.sidebar.number_input("Average Goals Scored by Team B", min_value=0.0, value=1.1)
-form_a = st.sidebar.slider("Form Percentage of Team A", min_value=0, max_value=100, value=47)
-form_b = st.sidebar.slider("Form Percentage of Team B", min_value=0, max_value=100, value=27)
-
-
-# Full-time odds
-home_odds = st.sidebar.number_input("Full-Time Odds (Home Win)", min_value=1.0, value=1.65)
-draw_odds = st.sidebar.number_input("Full-Time Odds (Draw)", min_value=1.0, value=4.23)
-away_odds = st.sidebar.number_input("Full-Time Odds (Away Win)", min_value=1.0, value=5.6)
-
-# Add a submit button to the sidebar
-with st.sidebar:
-    st.markdown("### Submit Prediction")
-    if st.button("Submit Prediction"):
-        st.success("Prediction submitted! Results will be displayed below.")
-
-# Calculate attack and defense strengths
-attack_strength_a = avg_goals_a * (form_a / 47)
-attack_strength_b = avg_goals_b * (form_b / 94)
-
-# Generate Poisson distribution probabilities
-max_goals = 5
-team_a_probs = [poisson.pmf(i, attack_strength_a) for i in range(max_goals + 1)]
-team_b_probs = [poisson.pmf(i, attack_strength_b) for i in range(max_goals + 1)]
-
-# Generate probability matrix
-prob_matrix = np.outer(team_a_probs, team_b_probs)
-
-# Calculate outcome probabilities
-home_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals + 1) for j in range(max_goals + 1) if i < j])
-draw_prob = np.sum([prob_matrix[i, j] for i in range(max_goals + 1) for j in range(max_goals + 1) if i == j])
-away_win_prob = np.sum([prob_matrix[i, j] for i in range(max_goals + 1) for j in range(max_goals + 1) if i > j])
-
-# Calculate the probability of the specific correct score (1-2)
-correct_score_prob = prob_matrix[1, 2]
-
-# Weight probabilities by odds
-weighted_home_win_prob = home_win_prob / home_odds
-weighted_draw_prob = draw_prob / draw_odds
-weighted_away_win_prob = away_win_prob / away_odds
-weighted_correct_score_prob = correct_score_prob / away_odds  # Emphasize the 1-2 scoreline
-
-# Normalize probabilities
-total_prob = weighted_home_win_prob + weighted_draw_prob + weighted_away_win_prob
-home_win_percentage = (weighted_home_win_prob / total_prob) * 100
-draw_percentage = (weighted_draw_prob / total_prob) * 100
-away_win_percentage = (weighted_away_win_prob / total_prob) * 100
-
-# Output probabilities
-print(f"Home Win Percentage: {home_win_percentage:.2f}%")
-print(f"Draw Percentage: {draw_percentage:.2f}%")
-print(f"Away Win Percentage: {away_win_percentage:.2f}%")
-print(f"Probability of Correct Score (1-2): {correct_score_prob:.2%}")
-
-# Most likely outcome
-most_likely_outcome = max(
-    ("Home Win", home_win_percentage),
-    ("Draw", draw_percentage),
-    ("Away Win", away_win_percentage),
-    key=lambda x: x[1],
-)
-
-# Recommended correct score based on the most likely outcome
-if most_likely_outcome[1] == "Home Win":
-    recommended_score = max(
-        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 2) for j in range(i)],
-        key=lambda x: x[2],
-    )
-elif most_likely_outcome[1] == "Draw":
-    recommended_score = max(
-        [(i, i, prob_matrix[i, i]) for i in range(max_goals + 1)],
-        key=lambda x: x[2],
-    )
-else:  # Away Win
-    recommended_score = max(
-        [(i, j, prob_matrix[i, j]) for i in range(max_goals + 1) for j in range(i + 1, max_goals + 1)],
-        key=lambda x: x[2],
-    )
-
-# Display match details
-st.write("### Match Details")
-st.write(f"**{team_a} vs {team_b}**")
-st.write(f"- **Team A Form (%):** {form_a}")
-st.write(f"- **Team B Form (%):** {form_b}")
-st.write(f"- **Odds (Home - Draw - Away):** {home_odds} - {draw_odds} - {away_odds}")
-
-# Display probabilities
-st.write("### Match Outcome Probabilities")
-st.write(f"- **Probability of Home Win**: {home_win_percentage:.2f}%")
-st.write(f"- **Probability of Draw**: {draw_percentage:.2f}%")
-st.write(f"- **Probability of Away Win**: {away_win_percentage:.2f}%")
-st.write(f"- **Most Likely Outcome**: {most_likely_outcome[0]} ({most_likely_outcome[1]:.2f}%)")
-
-# Correct scores
-st.write("### Correct Score Probabilities")
+# Generate Poisson matrix
+st.subheader("Prediction Matrix")
+score_matrix = np.zeros((max_goals + 1, max_goals + 1))
 for i in range(max_goals + 1):
     for j in range(max_goals + 1):
-        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
+        score_matrix[i, j] = poisson.pmf(i, avg_goals_A) * poisson.pmf(j, avg_goals_B)
 
-# Recommended correct score
-st.write("### Recommended Correct Score")
-st.write(f"The recommended correct score is **{team_a} {recommended_score[0]} - {team_b} {recommended_score[1]}** with a probability of **{recommended_score[2] * 100:.2f}%**.")
+# Display the matrix
+df_matrix = pd.DataFrame(score_matrix, 
+                         index=[f"A: {i}" for i in range(max_goals + 1)], 
+                         columns=[f"B: {j}" for j in range(max_goals + 1)])
+st.dataframe(df_matrix.style.format("{:.4f}"))
 
-# Align scores with full-time probabilities
-st.write("### Aligned Scores with Outcomes")
-st.write("**Home Win Scores:**")
-for i in range(max_goals + 1):
-    for j in range(i):
-        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 100:.2f}%")
+# Most likely scoreline
+most_likely_score = np.unravel_index(np.argmax(score_matrix), score_matrix.shape)
+most_likely_probability = score_matrix[most_likely_score]
 
-st.write("**Draw Scores:**")
-for i in range(max_goals + 1):
-    st.write(f"{team_a} {i} - {team_b} {i}: {prob_matrix[i, i] * 100:.2f}%")
+# Results
+st.subheader("Results")
+st.write(f"The most likely scoreline is **{most_likely_score[0]}-{most_likely_score[1]}** "
+         f"with a probability of **{most_likely_probability:.2%}**.")
 
-st.write("**Away Win Scores:**")
-for i in range(max_goals + 1):
-    for j in range(i + 1, max_goals + 1):
-        st.write(f"{team_a} {i} - {team_b} {j}: {prob_matrix[i, j] * 94:.2f}%")
+# Cumulative probabilities
+st.subheader("Cumulative Probabilities")
+cumulative_A = score_matrix.sum(axis=1)
+cumulative_B = score_matrix.sum(axis=0)
+st.write("### Team A Cumulative Probabilities")
+for i, prob in enumerate(cumulative_A):
+    st.write(f"Team A scoring {i} goals: {prob:.2%}")
+st.write("### Team B Cumulative Probabilities")
+for j, prob in enumerate(cumulative_B):
+    st.write(f"Team B scoring {j} goals: {prob:.2%}")
+
+# Calculate outcome probabilities
+win_prob_A = np.sum(np.tril(score_matrix, k=-1))  # Team A wins
+draw_prob = np.sum(np.diag(score_matrix))        # Draw
+win_prob_B = np.sum(np.triu(score_matrix, k=1))  # Team B wins
+prob_over_1_5 = 1 - np.sum(score_matrix[0:2, 0:2])
+prob_under_1_5 = np.sum(score_matrix[0:2, 0:2])
+prob_over_2_5 = 1 - np.sum(score_matrix[0:3, 0:3])
+prob_under_2_5 = np.sum(score_matrix[0:3, 0:3])
+prob_btts_gg = np.sum(score_matrix[1:, 1:])
+prob_btts_ng = 1 - prob_btts_gg
+
+# Display outcome probabilities
+st.subheader("Outcome Probabilities")
+st.write(f"Probability of Home Win: **{win_prob_A:.2%}**")
+st.write(f"Probability of Draw: **{draw_prob:.2%}**")
+st.write(f"Probability of Away Win: **{win_prob_B:.2%}**")
+st.write(f"Probability of Over 1.5 Goals: **{prob_over_1_5:.2%}**")
+st.write(f"Probability of Under 1.5 Goals: **{prob_under_1_5:.2%}**")
+st.write(f"Probability of Over 2.5 Goals: **{prob_over_2_5:.2%}**")
+st.write(f"Probability of Under 2.5 Goals: **{prob_under_2_5:.2%}**")
+st.write(f"Probability of Both Teams to Score (GG): **{prob_btts_gg:.2%}**")
+st.write(f"Probability of Both Teams Not to Score (NG): **{prob_btts_ng:.2%}**")
+
+# Value bet analysis
+st.subheader("Value Bet Analysis")
+ev_home = (win_prob_A * odds_home) - 1
+ev_draw = (draw_prob * odds_draw) - 1
+ev_away = (win_prob_B * odds_away) - 1
+ev_over_1_5 = (prob_over_1_5 * odds_over_1_5) - 1
+ev_under_1_5 = (prob_under_1_5 * odds_under_1_5) - 1
+ev_over_2_5 = (prob_over_2_5 * odds_over_2_5) - 1
+ev_under_2_5 = (prob_under_2_5 * odds_under_2_5) - 1
+ev_btts_gg = (prob_btts_gg * odds_btts_gg) - 1
+ev_btts_ng = (prob_btts_ng * odds_btts_ng) - 1
+
+st.write(f"Expected Value for Home Win: **{ev_home:.2f}**")
+st.write(f"Expected Value for Draw: **{ev_draw:.2f}**")
+st.write(f"Expected Value for Away Win: **{ev_away:.2f}**")
+st.write(f"Expected Value for Over 1.5 Goals: **{ev_over_1_5:.2f}**")
+st.write(f"Expected Value for Under 1.5 Goals: **{ev_under_1_5:.2f}**")
+st.write(f"Expected Value for Over 2.5 Goals: **{ev_over_2_5:.2f}**")
+st.write(f"Expected Value for Under 2.5 Goals: **{ev_under_2_5:.2f}**")
+st.write(f"Expected Value for Both Teams to Score (GG): **{ev_btts_gg:.2f}**")
+st.write(f"Expected Value for Both Teams Not to Score (NG): **{ev_btts_ng:.2f}**")
+
+# Final recommendation
+st.subheader("Final Recommendation")
+if ev_home > 0:
+    st.write("Value Bet Recommendation: **Home Win**")
+elif ev_draw > 0:
+    st.write("Value Bet Recommendation: **Draw**")
+elif ev_away > 0:
+    st.write("Value Bet Recommendation: **Away Win**")
+else:
+    st.write("No clear value bet detected.")
