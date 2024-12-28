@@ -4,7 +4,7 @@ import pandas as pd
 from scipy.stats import poisson
 
 # Title
-st.title("🤖🤖🤖⚽💯Rabiotic Football Match Real Correct Score Predictor")
+st.title("Football Match Real Correct Score Predictor")
 
 # Input parameters
 st.header("Team Statistics")
@@ -103,11 +103,11 @@ st.write(f"Expected Value for Both Teams Not to Score (NG): **{ev_btts_ng:.2f}**
 
 # Final recommendation
 st.subheader("Final Recommendation")
+final_recommendation = "No clear value bet detected."
 if ev_home > 0:
-    st.write("Value Bet Recommendation: **Home Win**")
+    final_recommendation = f"Value Bet Recommendation: **Home Win** with Correct Score **{most_likely_score[0]}-{most_likely_score[1]}**"
 elif ev_draw > 0:
-    st.write("Value Bet Recommendation: **Draw**")
+    final_recommendation = f"Value Bet Recommendation: **Draw** with Correct Score **{most_likely_score[0]}-{most_likely_score[1]}**"
 elif ev_away > 0:
-    st.write("Value Bet Recommendation: **Away Win**")
-else:
-    st.write("No clear value bet detected.")
+    final_recommendation = f"Value Bet Recommendation: **Away Win** with Correct Score **{most_likely_score[0]}-{most_likely_score[1]}**"
+st.write(final_recommendation)
