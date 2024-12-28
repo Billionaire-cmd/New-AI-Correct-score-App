@@ -91,6 +91,12 @@ ev_under_2_5 = (prob_under_2_5 * odds_under_2_5) - 1
 ev_btts_gg = (prob_btts_gg * odds_btts_gg) - 1
 ev_btts_ng = (prob_btts_ng * odds_btts_ng) - 1
 
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
 st.write(f"Expected Value for Home Win: **{ev_home:.2f}**")
 st.write(f"Expected Value for Draw: **{ev_draw:.2f}**")
 st.write(f"Expected Value for Away Win: **{ev_away:.2f}**")
