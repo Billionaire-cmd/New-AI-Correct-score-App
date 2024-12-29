@@ -79,6 +79,18 @@ st.write(f"Probability of Under 2.5 Goals: **{prob_under_2_5:.2%}**")
 st.write(f"Probability of Both Teams to Score (GG): **{prob_btts_gg:.2%}**")
 st.write(f"Probability of Both Teams Not to Score (NG): **{prob_btts_ng:.2%}**")
 
+# Correct score analysis
+st.subheader("Correct Score Analysis")
+flat_scores = [
+    (i, j, score_matrix[i, j]) for i in range(max_goals + 1) for j in range(max_goals + 1)
+]
+flat_scores.sort(key=lambda x: x[2], reverse=True)
+
+# Display top 5 most likely scores
+st.write("### Top 5 Most Likely Scorelines:")
+for rank, (i, j, prob) in enumerate(flat_scores[:5], 1):
+    st.write(f"{rank}. **{i}-{j}** with probability **{prob:.2%}**")
+
 # Value bet analysis
 st.subheader("Value Bet Analysis")
 ev_home = (win_prob_A * odds_home) - 1
@@ -90,12 +102,6 @@ ev_over_2_5 = (prob_over_2_5 * odds_over_2_5) - 1
 ev_under_2_5 = (prob_under_2_5 * odds_under_2_5) - 1
 ev_btts_gg = (prob_btts_gg * odds_btts_gg) - 1
 ev_btts_ng = (prob_btts_ng * odds_btts_ng) - 1
-
-# Add a submit button to the sidebar
-with st.sidebar:
-    st.markdown("### Submit Prediction")
-    if st.button("Submit Prediction"):
-        st.success("Prediction submitted! Results will be displayed below.")
 
 st.write(f"Expected Value for Home Win: **{ev_home:.2f}**")
 st.write(f"Expected Value for Draw: **{ev_draw:.2f}**")
@@ -109,8 +115,6 @@ st.write(f"Expected Value for Both Teams Not to Score (NG): **{ev_btts_ng:.2f}**
 
 # Final recommendation
 st.subheader("Final Recommendation")
-
-# Filter most likely score based on the match result condition
 def get_most_likely_score(condition):
     filtered_scores = {
         "home_win": [(i, j, score_matrix[i, j]) for i in range(max_goals + 1) for j in range(max_goals + 1) if i > j],
@@ -119,11 +123,10 @@ def get_most_likely_score(condition):
     }
     scores = filtered_scores[condition]
     if scores:
-        return max(scores, key=lambda x: x[2])[:2]  # Return the score with the highest probability
+        return max(scores, key=lambda x: x[2])[:2]
     else:
-        return None  # No valid scores
+        return None
 
-# Determine final recommendation based on expected value
 final_recommendation = "No clear value bet detected."
 if ev_home > 0:
     likely_score = get_most_likely_score("home_win")
