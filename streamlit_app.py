@@ -91,7 +91,7 @@ win_prob_B = np.sum(np.triu(score_matrix, k=1))
 
 prob_over_1_5 = np.sum(score_matrix[2:].sum(axis=1) + score_matrix[:, 2:].sum(axis=0)) - score_matrix[2:, 2:].sum()
 prob_under_1_5 = 1 - prob_over_1_5
-prob_over_2_5 = np.sum(score_matrix[3:].sum(axis=1) + score_matrix[:, 3:].sum(axis=0)) - score_matrix[3:, 3:].sum()
+prob_over_2_5 = np.sum(score_matrix[2:].sum(axis=1) + score_matrix[:, 2:].sum(axis=0)) - score_matrix[2:, 2:].sum()
 prob_under_2_5 = 1 - prob_over_2_5
 prob_btts_gg = np.sum(score_matrix[1:, 1:])
 prob_btts_ng = 1 - prob_btts_gg
