@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.stats import poisson
 
 # Title
-st.title("🤖🤖🤖💯💯💯 Rabiotic Football Match Real Correct Score Predictor")
+st.title("🤖🤖🤖💯Rabiotic Football Match Real Correct Score Predictor")
 
 # Input parameters
 st.header("Team Statistics")
