@@ -73,6 +73,17 @@ st.subheader("Results")
 st.write(f"The most likely scoreline is **{most_likely_score[0]}-{most_likely_score[1]}** "
          f"with a probability of **{most_likely_probability:.2%}**.")
 
+# Cumulative probabilities
+st.subheader("Cumulative Probabilities")
+cumulative_A = score_matrix.sum(axis=1)
+cumulative_B = score_matrix.sum(axis=0)
+st.write("### Team A Cumulative Probabilities")
+for i, prob in enumerate(cumulative_A):
+    st.write(f"Team A scoring {i} goals: {prob:.2%}")
+st.write("### Team B Cumulative Probabilities")
+for j, prob in enumerate(cumulative_B):
+    st.write(f"Team B scoring {j} goals: {prob:.2%}")
+
 # Calculate outcome probabilities
 win_prob_A = np.sum(np.tril(score_matrix, k=-1))
 draw_prob = np.sum(np.diag(score_matrix))
