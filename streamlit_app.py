@@ -5,7 +5,7 @@ import pandas as pd
 from scipy.stats import poisson
 
 # Title
-st.title("🤖🤖🤖⚽💯💯💯 Rabiotic Football Match Real Correct Score Predictor")
+st.title("🤖🤖🤖💯💯💯 Rabiotic Football Match Real Correct Score Predictor")
 
 # Input parameters
 st.header("Team Statistics")
@@ -35,6 +35,12 @@ odds_over_2_5 = st.number_input("Odds for Over 2.5 Goals", value=1.9)
 odds_under_2_5 = st.number_input("Odds for Under 2.5 Goals", value=1.8)
 odds_btts_gg = st.number_input("Odds for Both Teams to Score (GG)", value=1.8)
 odds_btts_ng = st.number_input("Odds for Both Teams Not to Score (NG)", value=2.0)
+
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
 
 # Calculate weights for validation
 total_meetings = home_wins + draws + away_wins
