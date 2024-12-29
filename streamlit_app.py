@@ -1,10 +1,11 @@
+# Importing required libraries
 import streamlit as st
 import numpy as np
 import pandas as pd
 from scipy.stats import poisson
 
 # Title
-st.title("🤖🤖🤖⚽💯💯💯Rabiotic Football Match Real Correct Score Predictor")
+st.title("🤖🤖🤖⚽💯💯💯 Rabiotic Football Match Real Correct Score Predictor")
 
 # Input parameters
 st.header("Team Statistics")
@@ -66,15 +67,29 @@ st.subheader("Results")
 st.write(f"The most likely scoreline is **{most_likely_score[0]}-{most_likely_score[1]}** "
          f"with a probability of **{most_likely_probability:.2%}**.")
 
-# Outcome probabilities incorporating previous meeting validation
-adjusted_win_prob_A = np.sum(np.tril(score_matrix, k=-1)) * home_win_prob
-adjusted_draw_prob = np.sum(np.diag(score_matrix)) * draw_prob
-adjusted_win_prob_B = np.sum(np.triu(score_matrix, k=1)) * away_win_prob
+# Calculate outcome probabilities
+win_prob_A = np.sum(np.tril(score_matrix, k=-1))
+draw_prob = np.sum(np.diag(score_matrix))
+win_prob_B = np.sum(np.triu(score_matrix, k=1))
 
-st.subheader("Adjusted Outcome Probabilities")
-st.write(f"Probability of Home Win: **{adjusted_win_prob_A:.2%}**")
-st.write(f"Probability of Draw: **{adjusted_draw_prob:.2%}**")
-st.write(f"Probability of Away Win: **{adjusted_win_prob_B:.2%}**")
+prob_over_1_5 = np.sum(score_matrix[2:].sum(axis=1) + score_matrix[:, 2:].sum(axis=0)) - score_matrix[2:, 2:].sum()
+prob_under_1_5 = 1 - prob_over_1_5
+prob_over_2_5 = np.sum(score_matrix[3:].sum(axis=1) + score_matrix[:, 3:].sum(axis=0)) - score_matrix[3:, 3:].sum()
+prob_under_2_5 = 1 - prob_over_2_5
+prob_btts_gg = np.sum(score_matrix[1:, 1:])
+prob_btts_ng = 1 - prob_btts_gg
+
+# Display outcome probabilities
+st.subheader("Outcome Probabilities")
+st.write(f"Probability of Home Win: **{win_prob_A:.2%}**")
+st.write(f"Probability of Draw: **{draw_prob:.2%}**")
+st.write(f"Probability of Away Win: **{win_prob_B:.2%}**")
+st.write(f"Probability of Over 1.5 Goals: **{prob_over_1_5:.2%}**")
+st.write(f"Probability of Under 1.5 Goals: **{prob_under_1_5:.2%}**")
+st.write(f"Probability of Over 2.5 Goals: **{prob_over_2_5:.2%}**")
+st.write(f"Probability of Under 2.5 Goals: **{prob_under_2_5:.2%}**")
+st.write(f"Probability of Both Teams to Score (GG): **{prob_btts_gg:.2%}**")
+st.write(f"Probability of Both Teams Not to Score (NG): **{prob_btts_ng:.2%}**")
 
 # Correct score analysis
 st.subheader("Correct Score Analysis")
@@ -88,8 +103,14 @@ st.write("### Top 5 Most Likely Scorelines:")
 for rank, (i, j, prob) in enumerate(flat_scores[:5], 1):
     st.write(f"{rank}. **{i}-{j}** with probability **{prob:.2%}**")
 
-# Final recommendation
+# Final Recommendation
 st.subheader("Final Recommendation")
+
+# Adjust probabilities using odds and team form percentages
+adjusted_win_prob_A = win_prob_A * (1 / odds_home) * form_percentage_A
+adjusted_draw_prob = draw_prob * (1 / odds_draw)
+adjusted_win_prob_B = win_prob_B * (1 / odds_away) * form_percentage_B
+
 def get_most_likely_score(condition):
     filtered_scores = {
         "home_win": [(i, j, score_matrix[i, j]) for i in range(max_goals + 1) for j in range(max_goals + 1) if i > j],
@@ -102,6 +123,7 @@ def get_most_likely_score(condition):
     else:
         return None
 
+# Determine the final recommendation
 final_recommendation = "No clear value bet detected."
 if adjusted_win_prob_A > adjusted_draw_prob and adjusted_win_prob_A > adjusted_win_prob_B:
     likely_score = get_most_likely_score("home_win")
@@ -116,4 +138,5 @@ elif adjusted_win_prob_B > adjusted_win_prob_A and adjusted_win_prob_B > adjuste
     if likely_score:
         final_recommendation = f"Value Bet Recommendation: **Away Win** with Correct Score **{likely_score[0]}-{likely_score[1]}**"
 
+# Display the final recommendation
 st.write(final_recommendation)
