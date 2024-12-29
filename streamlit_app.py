@@ -108,17 +108,6 @@ flat_scores.sort(key=lambda x: x[2], reverse=True)
 st.write("### Top 5 Most Likely Scorelines:")
 for rank, (i, j, prob) in enumerate(flat_scores[:5], 1):
     st.write(f"{rank}. **{i}-{j}** with probability **{prob:.2%}**")
-
-st.write(f"Expected Value for Home Win: **{ev_home:.2f}**")
-st.write(f"Expected Value for Draw: **{ev_draw:.2f}**")
-st.write(f"Expected Value for Away Win: **{ev_away:.2f}**")
-st.write(f"Expected Value for Over 1.5 Goals: **{ev_over_1_5:.2f}**")
-st.write(f"Expected Value for Under 1.5 Goals: **{ev_under_1_5:.2f}**")
-st.write(f"Expected Value for Over 2.5 Goals: **{ev_over_2_5:.2f}**")
-st.write(f"Expected Value for Under 2.5 Goals: **{ev_under_2_5:.2f}**")
-st.write(f"Expected Value for Both Teams to Score (GG): **{ev_btts_gg:.2f}**")
-st.write(f"Expected Value for Both Teams Not to Score (NG): **{ev_btts_ng:.2f}**")
-
 # Final Recommendation
 st.subheader("Final Recommendation")
 
