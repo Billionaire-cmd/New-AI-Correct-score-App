@@ -4,7 +4,7 @@ import numpy as np
 from scipy.stats import poisson
 
 # Title
-st.title("💯💯💯🤖🤖🤖 Rabiotic Deep Advanced Football Match Correct score Outcome Analysis Predictor")
+st.title("💯💯💯🤖🤖🤖 Rabiotic Deep Advanced Football Match ✅Correct score Outcome Analysis Predictor")
 
 # Input parameters
 st.header("Team Statistics")
