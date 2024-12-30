@@ -165,4 +165,4 @@ else:
     final_correct_score = sorted_scorelines[0][0]
 
 st.write(f"Recommendation: Bet on **{combined_recommendation}**")
-st.write(f"Final Reliable Correct Score Prediction: **{final_correct_score}**")
+st.write(f"Final 1x2 Probability-Based Percentages Correct Score Prediction: **{final_correct_score}**")
