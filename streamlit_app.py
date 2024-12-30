@@ -152,6 +152,40 @@ st.write(f"Probability of GG: **{gg_prob * 100:.2f}%**")
 st.write(f"Probability of NG: **{ng_prob * 100:.2f}%**")
 st.write(f"Recommendation: Bet on **{'GG' if gg_prob > 0.5 else 'NG'}**")
 
+# Calculate value bets for correct scores
+def calculate_value_bet_correct_score(scoreline_probs, odds_for_scoreline):
+    """Finds the highest probability correct score that is also a profitable value bet."""
+    value_bets = {
+        scoreline: prob for scoreline, prob in scoreline_probs.items()
+        if scoreline in odds_for_scoreline and prob * odds_for_scoreline[scoreline] > 1
+    }
+    if value_bets:
+        best_value_scoreline = max(value_bets, key=value_bets.get)
+        return best_value_scoreline, value_bets[best_value_scoreline]
+    else:
+        return None, None
+
+# Example odds for correct scorelines (should be replaced with actual odds)
+odds_for_scoreline = {
+    "0-0": 7.0, "1-0": 6.5, "0-1": 7.2, "1-1": 5.8,
+    "2-0": 10.0, "0-2": 11.0, "2-1": 8.0, "1-2": 8.5,
+    "3-0": 15.0, "0-3": 17.0, "3-1": 13.0, "1-3": 14.0,
+}
+
+# Find the best value bet correct score
+best_value_scoreline, best_value_prob = calculate_value_bet_correct_score(scoreline_probs, odds_for_scoreline)
+
+# Display the best value bet correct score
+if best_value_scoreline:
+    st.subheader("Value Bet Correct Score")
+    st.write(f"The correct score with the highest probability that is also a value bet: **{best_value_scoreline}**")
+    st.write(f"Probability: **{best_value_prob * 100:.2f}%**")
+    st.write(f"Odds: **{odds_for_scoreline[best_value_scoreline]}**")
+    st.write(f"Expected Value (EV): **{best_value_prob * odds_for_scoreline[best_value_scoreline]:.2f}**")
+else:
+    st.subheader("Value Bet Correct Score")
+    st.write("No profitable value bet for correct scores based on the given odds.")
+
 # Determine final correct score based on combined recommendations
 st.subheader("Combined Recommendations (Over/Under 2.5 & GG/NG)")
 if ou_probs["Over 2.5"] > 0.5 and gg_prob > 0.5:
