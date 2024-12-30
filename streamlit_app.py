@@ -200,3 +200,63 @@ else:
 
 st.write(f"Recommendation: Bet on **{combined_recommendation}**")
 st.write(f"Final 1x2 Probability-Based Percentages Correct Score Prediction: **{final_correct_score}**")
+# Step 1: Define the original probabilities for the top 12 scorelines
+scoreline_probabilities = [
+    {"scoreline": "1:0", "probability": 5.28},
+    {"scoreline": "1:1", "probability": 6.19},
+    {"scoreline": "2:1", "probability": 4.75},
+    {"scoreline": "0:0", "probability": 3.84},
+    {"scoreline": "2:0", "probability": 3.65},
+    {"scoreline": "0:1", "probability": 3.21},
+    {"scoreline": "1:2", "probability": 3.15},
+    {"scoreline": "3:1", "probability": 2.89},
+    {"scoreline": "1:3", "probability": 2.45},
+    {"scoreline": "2:2", "probability": 2.31},
+    {"scoreline": "0:2", "probability": 2.14},
+    {"scoreline": "3:0", "probability": 1.97},
+]
+
+# Step 2: Normalize probabilities to ensure they sum to 100%
+total_prob = sum(item["probability"] for item in scoreline_probabilities)
+for item in scoreline_probabilities:
+    item["normalized_probability"] = (item["probability"] / total_prob) * 100
+
+# Step 3: Apply matrix weighting adjustment
+# Define the adjustment factor (e.g., +10%)
+adjustment_factor = 1.10  # This increases probabilities by 10%
+
+adjusted_probabilities = []
+for item in scoreline_probabilities:
+    adjusted_probability = item["normalized_probability"] * adjustment_factor
+    adjusted_probabilities.append({
+        "scoreline": item["scoreline"],
+        "adjusted_probability": adjusted_probability
+    })
+
+# Step 4: Find the matrix-recommended correct score
+matrix_recommendation = max(adjusted_probabilities, key=lambda x: x["adjusted_probability"])
+
+# Define the Final 1x2 Prediction (example values)
+final_1x2_prediction = {
+    "1": 45,  # Home win percentage
+    "X": 30,  # Draw percentage
+    "2": 25   # Away win percentage
+}
+
+# Step 5: Output the results
+final_output = {
+    "Final 1x2 Prediction": final_1x2_prediction,
+    "Matrix Recommendation": {
+        "Correct Score": matrix_recommendation["scoreline"],
+        "Probability": round(matrix_recommendation["adjusted_probability"], 2)
+    }
+}
+
+# Display the results
+print("Final 1x2 Prediction:")
+for result, percentage in final_output["Final 1x2 Prediction"].items():
+    print(f"  {result}: {percentage}%")
+
+print("\nMatrix Recommendation:")
+print(f"  Correct Score: {final_output['Matrix Recommendation']['Correct Score']}")
+print(f"  Probability: {final_output['Matrix Recommendation']['Probability']}%")
