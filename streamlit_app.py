@@ -56,6 +56,29 @@ def poisson_prob(expected_goals, max_goals=3):
 probs_A = poisson_prob(expected_goals_A)
 probs_B = poisson_prob(expected_goals_B)
 
+# Display probabilities for each possible scoreline
+scoreline_probs = {}
+for i in range(4):  # Goals by Team A
+    for j in range(4):  # Goals by Team B
+        scoreline_probs[(i, j)] = probs_A[i] * probs_B[j]
+
+# Calculate probabilities for 1x2 outcomes
+home_win_prob = sum(prob for (i, j), prob in scoreline_probs.items() if i > j)
+draw_prob = sum(prob for (i, j), prob in scoreline_probs.items() if i == j)
+away_win_prob = sum(prob for (i, j), prob in scoreline_probs.items() if i < j)
+
+# Normalize probabilities to percentages
+total_prob = home_win_prob + draw_prob + away_win_prob
+home_win_percent = (home_win_prob / total_prob) * 100
+draw_percent = (draw_prob / total_prob) * 100
+away_win_percent = (away_win_prob / total_prob) * 100
+
+# Display 1x2 probabilities
+st.subheader("1x2 Probability-Based Percentages")
+st.write(f"Probability of Home Win: **{home_win_percent:.2f}%**")
+st.write(f"Probability of Draw: **{draw_percent:.2f}%**")
+st.write(f"Probability of Away Win: **{away_win_percent:.2f}%**")
+
 # Display deep analysis of team goals probabilities
 st.subheader("Deep Analysis of Team Goals Probability (%)")
 st.write("### Team A (Home)")
