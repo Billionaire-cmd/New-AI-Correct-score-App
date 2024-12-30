@@ -85,6 +85,31 @@ st.write(f"Probability of Home Win: **{home_win_percent:.2f}%**")
 st.write(f"Probability of Draw: **{draw_percent:.2f}%**")
 st.write(f"Probability of Away Win: **{away_win_percent:.2f}%**")
 
+# Calculate Value Bet for Correct Score
+def calculate_value_bet(scoreline_probs, correct_score_odds):
+    """Finds the correct score value bet if profitable."""
+    value_bet = None
+    highest_value = 0
+    for (a, b), prob in scoreline_probs.items():
+        scoreline = f"{a}-{b}"
+        if scoreline in correct_score_odds:
+            implied_prob = 1 / correct_score_odds[scoreline]
+            if prob > implied_prob:  # Only consider profitable bets
+                value = prob * correct_score_odds[scoreline]  # Expected value
+                if value > highest_value:
+                    highest_value = value
+                    value_bet = scoreline
+    return value_bet
+
+value_bet = calculate_value_bet(scoreline_probs, correct_score_odds)
+
+# Display Value Bet
+st.subheader("Value Bet Correct Score")
+if value_bet:
+    st.write(f"The value bet correct score is: **{value_bet}**")
+else:
+    st.write("No profitable value bet found for correct scores.")
+
 # Display deep analysis of team goals probabilities
 st.subheader("Deep Analysis of Team Goals Probability (%)")
 st.write("### Team A (Home)")
