@@ -137,3 +137,18 @@ elif ou_probs["Under 2.5"] > 0.5 and ng_prob > 0.5:
     st.write("Recommendation: Bet on **Under 2.5 & NG**")
 else:
     st.write("Recommendation: Bet on **No Clear Combined Option**")
+
+# Determine final correct score based on combined recommendations
+st.subheader("Combined Recommendations (Over/Under 2.5 & GG/NG)")
+if ou_probs["Over 2.5"] > 0.5 and gg_prob > 0.5:
+    combined_recommendation = "Over 2.5 & GG"
+    final_correct_score = next((scoreline for scoreline, prob in sorted_scorelines if int(scoreline.split("-")[0]) > 1 and int(scoreline.split("-")[1]) > 0), "2-1")
+elif ou_probs["Under 2.5"] > 0.5 and ng_prob > 0.5:
+    combined_recommendation = "Under 2.5 & NG"
+    final_correct_score = next((scoreline for scoreline, prob in sorted_scorelines if int(scoreline.split("-")[0]) + int(scoreline.split("-")[1]) <= 2 and (int(scoreline.split("-")[0]) == 0 or int(scoreline.split("-")[1]) == 0)), "1-0")
+else:
+    combined_recommendation = "No Clear Combined Option"
+    final_correct_score = sorted_scorelines[0][0]
+
+st.write(f"Recommendation: Bet on **{combined_recommendation}**")
+st.write(f"Final Reliable Correct Score Prediction: **{final_correct_score}**")
