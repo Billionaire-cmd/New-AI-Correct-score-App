@@ -38,6 +38,12 @@ odds_under_2_5 = st.number_input("Odds for Under 2.5 Goals", value=1.8)
 odds_btts_gg = st.number_input("Odds for Both Teams to Score (GG)", value=1.8)
 odds_btts_ng = st.number_input("Odds for Both Teams Not to Score (NG)", value=2.0)
 
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
 # Calculate expected goals
 expected_goals_A = (home_goals_scored + away_goals_conceded) / 2
 expected_goals_B = (away_goals_scored + home_goals_conceded) / 2
@@ -136,13 +142,6 @@ st.write(f"Under 2.5 Goals: {'Value Bet' if calculate_value(ou_probs['Under 2.5'
 st.write(f"Both Teams to Score (GG): {'Value Bet' if calculate_value(gg_prob, odds_btts_gg) else 'No Value'}")
 st.write(f"Both Teams Not to Score (NG): {'Value Bet' if calculate_value(ng_prob, odds_btts_ng) else 'No Value'}")
 
-# Recommendations
-st.subheader("Probability-Based Recommendations")
-st.write("### 1x2 Recommendations")
-st.write(f"Probability of Home Win: **{np.sum(probs_A) * 100:.2f}%**")
-st.write(f"Probability of Draw: **{np.sum([probs_A[i] * probs_B[i] for i in range(len(probs_A))]) * 100:.2f}%**")
-st.write(f"Probability of Away Win: **{np.sum(probs_B) * 100:.2f}%**")
-
 st.write("### Over/Under Recommendations")
 for key, value in ou_probs.items():
     st.write(f"Probability of {key}: **{value * 100:.2f}%**")
@@ -152,14 +151,6 @@ st.write("### GG/NG Recommendations")
 st.write(f"Probability of GG: **{gg_prob * 100:.2f}%**")
 st.write(f"Probability of NG: **{ng_prob * 100:.2f}%**")
 st.write(f"Recommendation: Bet on **{'GG' if gg_prob > 0.5 else 'NG'}**")
-
-st.write("### Combined Recommendations (Over/Under 2.5 & GG/NG)")
-if ou_probs["Over 2.5"] > 0.5 and gg_prob > 0.5:
-    st.write("Recommendation: Bet on **Over 2.5 & GG**")
-elif ou_probs["Under 2.5"] > 0.5 and ng_prob > 0.5:
-    st.write("Recommendation: Bet on **Under 2.5 & NG**")
-else:
-    st.write("Recommendation: Bet on **No Clear Combined Option**")
 
 # Determine final correct score based on combined recommendations
 st.subheader("Combined Recommendations (Over/Under 2.5 & GG/NG)")
