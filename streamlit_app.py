@@ -1,7 +1,6 @@
 # Importing required libraries
 import streamlit as st
 import numpy as np
-import pandas as pd
 from scipy.stats import poisson
 
 # Title
@@ -29,6 +28,15 @@ st.header("Odds Information")
 odds_home = st.number_input("Odds for Home Win", value=2.5)
 odds_draw = st.number_input("Odds for Draw", value=3.2)
 odds_away = st.number_input("Odds for Away Win", value=2.8)
+
+# Additional Odds for Verification
+st.header("Additional Odds for Verification")
+odds_over_1_5 = st.number_input("Odds for Over 1.5 Goals", value=1.5)
+odds_under_1_5 = st.number_input("Odds for Under 1.5 Goals", value=2.6)
+odds_over_2_5 = st.number_input("Odds for Over 2.5 Goals", value=1.9)
+odds_under_2_5 = st.number_input("Odds for Under 2.5 Goals", value=1.8)
+odds_btts_gg = st.number_input("Odds for Both Teams to Score (GG)", value=1.8)
+odds_btts_ng = st.number_input("Odds for Both Teams Not to Score (NG)", value=2.0)
 
 # Calculate expected goals
 expected_goals_A = (home_goals_scored + away_goals_conceded) / 2
@@ -58,26 +66,19 @@ st.write("### Team B (Away)")
 for i, prob in enumerate(probs_B):
     st.write(f"Probability of Team B scoring {i if i < 3 else '3+'} goals: **{prob * 100:.2f}%**")
 
-# Calculate 1x2 probabilities
-win_prob_A = np.sum(np.tril(probs_A, k=-1)) * form_percentage_A
-draw_prob = np.sum(probs_A[i] * probs_B[i] for i in range(len(probs_A)))
-win_prob_B = np.sum(np.triu(probs_B, k=1)) * form_percentage_B
-
 # Calculate Over/Under probabilities
 ou_probs = {
     "Over 1.5": 1 - (probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0]),
     "Under 1.5": probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0],
     "Over 2.5": 1 - (probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0] + probs_A[1] * probs_B[1]),
     "Under 2.5": probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0] + probs_A[1] * probs_B[1],
-    "Over 3.5": 1 - np.sum(probs_A[:3]) * np.sum(probs_B[:3]),
-    "Under 3.5": np.sum(probs_A[:3]) * np.sum(probs_B[:3]),
 }
 
 # Calculate GG/NG probabilities
 gg_prob = np.sum([probs_A[i] * probs_B[j] for i in range(1, len(probs_A)) for j in range(1, len(probs_B))])
 ng_prob = 1 - gg_prob
 
-# Scoreline calculation (Advanced)
+# Scoreline calculation
 scoreline_probs = {}
 for i in range(4):  # Possible goals for Team A
     for j in range(4):  # Possible goals for Team B
@@ -86,7 +87,7 @@ for i in range(4):  # Possible goals for Team A
 # Sort scorelines by probability
 sorted_scorelines = sorted(scoreline_probs.items(), key=lambda x: x[1], reverse=True)
 
-# Display top 9 most likely scorelines with probabilities
+# Display top 9 most likely scorelines
 st.subheader("Top 9 Most Likely Scorelines")
 for i, (scoreline, prob) in enumerate(sorted_scorelines[:9]):
     st.write(f"{scoreline}: **{prob * 100:.2f}%**")
@@ -99,19 +100,25 @@ st.subheader("Recommended Scoreline Bet")
 for scoreline, prob in top_3_scorelines:
     st.write(f"Recommended Bet on Scoreline **{scoreline}** with probability **{prob * 100:.2f}%**")
 
+# Value odds calculation
+def calculate_value(probability, odds):
+    return probability * odds > 1
+
+# Display odds verification
+st.subheader("Odds Value Verification")
+st.write(f"Over 1.5 Goals: {'Value Bet' if calculate_value(ou_probs['Over 1.5'], odds_over_1_5) else 'No Value'}")
+st.write(f"Under 1.5 Goals: {'Value Bet' if calculate_value(ou_probs['Under 1.5'], odds_under_1_5) else 'No Value'}")
+st.write(f"Over 2.5 Goals: {'Value Bet' if calculate_value(ou_probs['Over 2.5'], odds_over_2_5) else 'No Value'}")
+st.write(f"Under 2.5 Goals: {'Value Bet' if calculate_value(ou_probs['Under 2.5'], odds_under_2_5) else 'No Value'}")
+st.write(f"Both Teams to Score (GG): {'Value Bet' if calculate_value(gg_prob, odds_btts_gg) else 'No Value'}")
+st.write(f"Both Teams Not to Score (NG): {'Value Bet' if calculate_value(ng_prob, odds_btts_ng) else 'No Value'}")
+
 # Recommendations
 st.subheader("Probability-Based Recommendations")
 st.write("### 1x2 Recommendations")
-st.write(f"Probability of Home Win: **{win_prob_A:.2%}**")
-st.write(f"Probability of Draw: **{draw_prob:.2%}**")
-st.write(f"Probability of Away Win: **{win_prob_B:.2%}**")
-
-if win_prob_A > win_prob_B and win_prob_A > draw_prob:
-    st.write("Recommendation: Bet on **Home Win**")
-elif win_prob_B > win_prob_A and win_prob_B > draw_prob:
-    st.write("Recommendation: Bet on **Away Win**")
-else:
-    st.write("Recommendation: Bet on **Draw**")
+st.write(f"Probability of Home Win: **{np.sum(probs_A) * 100:.2f}%**")
+st.write(f"Probability of Draw: **{np.sum([probs_A[i] * probs_B[i] for i in range(len(probs_A))]) * 100:.2f}%**")
+st.write(f"Probability of Away Win: **{np.sum(probs_B) * 100:.2f}%**")
 
 st.write("### Over/Under Recommendations")
 for key, value in ou_probs.items():
@@ -119,8 +126,8 @@ for key, value in ou_probs.items():
 st.write(f"Recommendation: Bet on **{'Over' if ou_probs['Over 2.5'] > 0.5 else 'Under'} 2.5 Goals**")
 
 st.write("### GG/NG Recommendations")
-st.write(f"Probability of GG: **{gg_prob:.2%}**")
-st.write(f"Probability of NG: **{ng_prob:.2%}**")
+st.write(f"Probability of GG: **{gg_prob * 100:.2f}%**")
+st.write(f"Probability of NG: **{ng_prob * 100:.2f}%**")
 st.write(f"Recommendation: Bet on **{'GG' if gg_prob > 0.5 else 'NG'}**")
 
 st.write("### Combined Recommendations (Over/Under 2.5 & GG/NG)")
@@ -129,4 +136,4 @@ if ou_probs["Over 2.5"] > 0.5 and gg_prob > 0.5:
 elif ou_probs["Under 2.5"] > 0.5 and ng_prob > 0.5:
     st.write("Recommendation: Bet on **Under 2.5 & NG**")
 else:
-    st.write("Recommendation: No clear combination bet value.")
+    st.write("Recommendation: Bet on **No Clear Combined Option**")
