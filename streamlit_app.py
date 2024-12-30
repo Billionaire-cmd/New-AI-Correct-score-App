@@ -116,9 +116,9 @@ for i in range(4):  # Possible goals for Team A
 # Sort scorelines by probability
 sorted_scorelines = sorted(scoreline_probs.items(), key=lambda x: x[1], reverse=True)
 
-# Display top 11 most likely scorelines
-st.subheader("Top 11 Most Likely Scorelines")
-for i, (scoreline, prob) in enumerate(sorted_scorelines[:11]):
+# Display top 12 most likely scorelines
+st.subheader("Top 12 Most Likely Scorelines")
+for i, (scoreline, prob) in enumerate(sorted_scorelines[:12]):
     st.write(f"{scoreline}: **{prob * 100:.2f}%**")
 
 # Top 5 most likely scorelines for recommendation
