@@ -67,8 +67,8 @@ for i in range(len(probs_A)):
 # Sort scorelines by probability
 sorted_scorelines = sorted(scorelines, key=lambda x: x[1], reverse=True)[:9]
 
-# Display Top 9 Scorelines
-st.subheader("Top 9 Most Likely Scorelines")
+# Display Top 5 Scorelines
+st.subheader("Top 5 Most Likely Scorelines")
 for idx, (scoreline, prob) in enumerate(sorted_scorelines, 1):
     st.write(f"{idx}. **{scoreline[0][0]} - {scoreline[0][1]}** with Probability: **{prob * 100:.2f}%**")
 
