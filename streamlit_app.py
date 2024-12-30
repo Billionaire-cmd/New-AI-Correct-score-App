@@ -260,3 +260,5 @@ for result, percentage in final_output["Final 1x2 Prediction"].items():
 print("\nMatrix Recommendation:")
 print(f"  Correct Score: {final_output['Matrix Recommendation']['Correct Score']}")
 print(f"  Probability: {final_output['Matrix Recommendation']['Probability']}%")
+print("\nRecommendation Correct Score (Sporty Hach):")
+print(f"Scoreline: {final_recommendation}, Probability: {final_probability * 100:.2f}%")
