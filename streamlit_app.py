@@ -30,12 +30,6 @@ odds_home = st.number_input("Odds for Home Win", value=2.5)
 odds_draw = st.number_input("Odds for Draw", value=3.2)
 odds_away = st.number_input("Odds for Away Win", value=2.8)
 
-# Add a submit button to the sidebar
-with st.sidebar:
-    st.markdown("### Submit Prediction")
-    if st.button("Submit Prediction"):
-        st.success("Prediction submitted! Results will be displayed below.")
-
 # Calculate expected goals
 expected_goals_A = (home_goals_scored + away_goals_conceded) / 2
 expected_goals_B = (away_goals_scored + home_goals_conceded) / 2
@@ -137,4 +131,3 @@ elif ou_probs["Under 2.5"] > 0.5 and ng_prob > 0.5:
     st.write("Recommendation: Bet on **Under 2.5 & NG**")
 else:
     st.write("Recommendation: No clear combination bet value.")
-
