@@ -30,6 +30,12 @@ odds_home = st.number_input("Odds for Home Win", value=2.5)
 odds_draw = st.number_input("Odds for Draw", value=3.2)
 odds_away = st.number_input("Odds for Away Win", value=2.8)
 
+# Add a submit button to the sidebar
+with st.sidebar:
+    st.markdown("### Submit Prediction")
+    if st.button("Submit Prediction"):
+        st.success("Prediction submitted! Results will be displayed below.")
+
 # Calculate expected goals
 expected_goals_A = (home_goals_scored + away_goals_conceded) / 2
 expected_goals_B = (away_goals_scored + home_goals_conceded) / 2
@@ -58,28 +64,37 @@ st.write("### Team B (Away)")
 for i, prob in enumerate(probs_B):
     st.write(f"Probability of Team B scoring {i if i < 3 else '3+'} goals: **{prob * 100:.2f}%**")
 
-# Calculate 1x2 probabilities
+# Calculate Top 9 most likely scorelines and probabilities
+scorelines = []
+for i in range(len(probs_A)):
+    for j in range(len(probs_B)):
+        scorelines.append(((i, j), probs_A[i] * probs_B[j]))
+
+# Sort scorelines by probability
+sorted_scorelines = sorted(scorelines, key=lambda x: x[1], reverse=True)[:9]
+
+# Display Top 9 Scorelines
+st.subheader("Top 9 Most Likely Scorelines")
+for idx, (scoreline, prob) in enumerate(sorted_scorelines, 1):
+    st.write(f"{idx}. **{scoreline[0][0]} - {scoreline[0][1]}** with Probability: **{prob * 100:.2f}%**")
+
+# Three most likely scorelines
+top_3_scorelines = sorted_scorelines[:3]
+st.subheader("Top 3 Most Likely Scorelines")
+for scoreline, prob in top_3_scorelines:
+    st.write(f"Scoreline: **{scoreline[0]} - {scoreline[1]}** with Probability: **{prob * 100:.2f}%**")
+
+# Probability-based recommendations for most likely scorelines
+recommended_scoreline = top_3_scorelines[0]  # Highest probability scoreline
+st.write(f"### Recommended Scoreline: **{recommended_scoreline[0][0]} - {recommended_scoreline[0][1]}** with Probability: **{recommended_scoreline[1] * 100:.2f}%**")
+
+# Recommendations (Other metrics)
+st.subheader("Probability-Based Recommendations")
+st.write("### 1x2 Recommendations")
 win_prob_A = np.sum(np.tril(probs_A, k=-1)) * form_percentage_A
 draw_prob = np.sum(probs_A[i] * probs_B[i] for i in range(len(probs_A)))
 win_prob_B = np.sum(np.triu(probs_B, k=1)) * form_percentage_B
 
-# Calculate Over/Under probabilities
-ou_probs = {
-    "Over 1.5": 1 - (probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0]),
-    "Under 1.5": probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0],
-    "Over 2.5": 1 - (probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0] + probs_A[1] * probs_B[1]),
-    "Under 2.5": probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0] + probs_A[1] * probs_B[1],
-    "Over 3.5": 1 - np.sum(probs_A[:3]) * np.sum(probs_B[:3]),
-    "Under 3.5": np.sum(probs_A[:3]) * np.sum(probs_B[:3]),
-}
-
-# Calculate GG/NG probabilities
-gg_prob = np.sum([probs_A[i] * probs_B[j] for i in range(1, len(probs_A)) for j in range(1, len(probs_B))])
-ng_prob = 1 - gg_prob
-
-# Recommendations
-st.subheader("Probability-Based Recommendations")
-st.write("### 1x2 Recommendations")
 st.write(f"Probability of Home Win: **{win_prob_A:.2%}**")
 st.write(f"Probability of Draw: **{draw_prob:.2%}**")
 st.write(f"Probability of Away Win: **{win_prob_B:.2%}**")
@@ -90,6 +105,20 @@ elif win_prob_B > win_prob_A and win_prob_B > draw_prob:
     st.write("Recommendation: Bet on **Away Win**")
 else:
     st.write("Recommendation: Bet on **Draw**")
+
+# Over/Under recommendations
+ou_probs = {
+    "Over 1.5": 1 - (probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0]),
+    "Under 1.5": probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0],
+    "Over 2.5": 1 - (probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0] + probs_A[1] * probs_B[1]),
+    "Under 2.5": probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0] + probs_A[1] * probs_B[1],
+    "Over 3.5": 1 - np.sum(probs_A[:3]) * np.sum(probs_B[:3]),
+    "Under 3.5": np.sum(probs_A[:3]) * np.sum(probs_B[:3]),
+}
+
+# GG/NG recommendations
+gg_prob = np.sum([probs_A[i] * probs_B[j] for i in range(1, len(probs_A)) for j in range(1, len(probs_B))])
+ng_prob = 1 - gg_prob
 
 st.write("### Over/Under Recommendations")
 for key, value in ou_probs.items():
@@ -108,3 +137,4 @@ elif ou_probs["Under 2.5"] > 0.5 and ng_prob > 0.5:
     st.write("Recommendation: Bet on **Under 2.5 & NG**")
 else:
     st.write("Recommendation: No clear combination bet value.")
+
