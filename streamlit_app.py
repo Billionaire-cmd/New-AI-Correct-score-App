@@ -121,12 +121,12 @@ st.subheader("Top 9 Most Likely Scorelines")
 for i, (scoreline, prob) in enumerate(sorted_scorelines[:9]):
     st.write(f"{scoreline}: **{prob * 100:.2f}%**")
 
-# Top 3 most likely scorelines for recommendation
-top_3_scorelines = sorted_scorelines[:3]
+# Top 5 most likely scorelines for recommendation
+top_5_scorelines = sorted_scorelines[:5]
 
 # Recommendation based on top scorelines
 st.subheader("Recommended Scoreline Bet")
-for scoreline, prob in top_3_scorelines:
+for scoreline, prob in top_5_scorelines:
     st.write(f"Recommended Bet on Scoreline **{scoreline}** with probability **{prob * 100:.2f}%**")
 
 # Value odds calculation
