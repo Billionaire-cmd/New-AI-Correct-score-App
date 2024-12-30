@@ -1,6 +1,7 @@
 # Importing required libraries
 import streamlit as st
 import numpy as np
+import pandas as pd
 from scipy.stats import poisson
 
 # Title
@@ -37,62 +38,73 @@ st.subheader("Expected Goals")
 st.write(f"Expected Goals for Team A: **{expected_goals_A:.2f}**")
 st.write(f"Expected Goals for Team B: **{expected_goals_B:.2f}**")
 
-# Generate Poisson distribution probabilities for scorelines
-def calculate_scoreline_probabilities(max_goals=5):
-    """Generate a matrix of probabilities for scorelines."""
-    prob_matrix = np.zeros((max_goals, max_goals))
-    for i in range(max_goals):
-        for j in range(max_goals):
-            prob_matrix[i, j] = poisson.pmf(i, expected_goals_A) * poisson.pmf(j, expected_goals_B)
-    return prob_matrix
+# Generate Poisson distribution probabilities for 0 to 3+ goals
+def poisson_prob(expected_goals, max_goals=3):
+    """Returns probabilities of scoring 0, 1, 2, 3+ goals."""
+    probs = [poisson.pmf(i, expected_goals) for i in range(max_goals)]
+    probs.append(1 - sum(probs))  # 3+ goals
+    return probs
 
-scoreline_probs = calculate_scoreline_probabilities(max_goals=6)  # Limit to 5 goals per team
+probs_A = poisson_prob(expected_goals_A)
+probs_B = poisson_prob(expected_goals_B)
 
-# Flatten the matrix and sort by probability
-scoreline_list = []
-for i in range(scoreline_probs.shape[0]):
-    for j in range(scoreline_probs.shape[1]):
-        scoreline_list.append(((i, j), scoreline_probs[i, j]))
+# Display deep analysis of team goals probabilities
+st.subheader("Deep Analysis of Team Goals Probability (%)")
+st.write("### Team A (Home)")
+for i, prob in enumerate(probs_A):
+    st.write(f"Probability of Team A scoring {i if i < 3 else '3+'} goals: **{prob * 100:.2f}%**")
 
-scoreline_list.sort(key=lambda x: x[1], reverse=True)
+st.write("### Team B (Away)")
+for i, prob in enumerate(probs_B):
+    st.write(f"Probability of Team B scoring {i if i < 3 else '3+'} goals: **{prob * 100:.2f}%**")
 
-# Display top 9 most likely scorelines
-st.subheader("Top 9 Most Likely Scorelines")
-top_9_scorelines = scoreline_list[:9]
-for idx, ((home_goals, away_goals), prob) in enumerate(top_9_scorelines):
-    st.write(f"{idx + 1}. {home_goals}-{away_goals} with Probability: **{prob * 100:.2f}%**")
-
-# Highlight the 3 most likely scorelines
-st.subheader("Top 3 Most Likely Scorelines")
-top_3_scorelines = scoreline_list[:3]
-for idx, ((home_goals, away_goals), prob) in enumerate(top_3_scorelines):
-    st.write(f"{idx + 1}. {home_goals}-{away_goals} with Probability: **{prob * 100:.2f}%**")
-
-# Previous functionalities remain (e.g., Over/Under, 1x2, GG/NG)
 # Calculate 1x2 probabilities
-win_prob_A = np.sum(scoreline_probs[:scoreline_probs.shape[0], :np.tril_indices(scoreline_probs.shape[1], -1)[1].max()]) * form_percentage_A
-draw_prob = np.sum([scoreline_probs[i, i] for i in range(scoreline_probs.shape[0])])
-win_prob_B = np.sum(scoreline_probs[:scoreline_probs.shape[0], :np.triu_indices(scoreline_probs.shape[1], 1)[0].max()]) * form_percentage_B
+win_prob_A = np.sum(np.tril(probs_A, k=-1)) * form_percentage_A
+draw_prob = np.sum(probs_A[i] * probs_B[i] for i in range(len(probs_A)))
+win_prob_B = np.sum(np.triu(probs_B, k=1)) * form_percentage_B
 
-# Over/Under and GG/NG probabilities (for brevity, omitted redundant formulas—refer to earlier code)
+# Calculate Over/Under probabilities
 ou_probs = {
-    "Over 1.5": 1 - (scoreline_probs[0, 0] + scoreline_probs[0, 1] + scoreline_probs[1, 0]),
-    "Under 1.5": scoreline_probs[0, 0] + scoreline_probs[0, 1] + scoreline_probs[1, 0],
-    "Over 2.5": 1 - np.sum(scoreline_probs[:2, :2]),
-    "Under 2.5": np.sum(scoreline_probs[:2, :2]),
-    "Over 3.5": 1 - np.sum(scoreline_probs[:3, :3]),
-    "Under 3.5": np.sum(scoreline_probs[:3, :3]),
+    "Over 1.5": 1 - (probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0]),
+    "Under 1.5": probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0],
+    "Over 2.5": 1 - (probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0] + probs_A[1] * probs_B[1]),
+    "Under 2.5": probs_A[0] * probs_B[0] + probs_A[0] * probs_B[1] + probs_A[1] * probs_B[0] + probs_A[1] * probs_B[1],
+    "Over 3.5": 1 - np.sum(probs_A[:3]) * np.sum(probs_B[:3]),
+    "Under 3.5": np.sum(probs_A[:3]) * np.sum(probs_B[:3]),
 }
 
-gg_prob = 1 - (scoreline_probs[:, 0].sum() + scoreline_probs[0, :].sum() - scoreline_probs[0, 0])
+# Calculate GG/NG probabilities
+gg_prob = np.sum([probs_A[i] * probs_B[j] for i in range(1, len(probs_A)) for j in range(1, len(probs_B))])
 ng_prob = 1 - gg_prob
 
 # Recommendations
 st.subheader("Probability-Based Recommendations")
+st.write("### 1x2 Recommendations")
 st.write(f"Probability of Home Win: **{win_prob_A:.2%}**")
 st.write(f"Probability of Draw: **{draw_prob:.2%}**")
 st.write(f"Probability of Away Win: **{win_prob_B:.2%}**")
 
-st.write(f"Recommendation: **{'Home Win' if win_prob_A > max(win_prob_B, draw_prob) else 'Away Win' if win_prob_B > max(win_prob_A, draw_prob) else 'Draw'}**")
-st.write(f"Over/Under 2.5 Recommendation: **{'Over' if ou_probs['Over 2.5'] > ou_probs['Under 2.5'] else 'Under'} 2.5 Goals**")
-st.write(f"GG/NG Recommendation: **{'GG' if gg_prob > ng_prob else 'NG'}**")
+if win_prob_A > win_prob_B and win_prob_A > draw_prob:
+    st.write("Recommendation: Bet on **Home Win**")
+elif win_prob_B > win_prob_A and win_prob_B > draw_prob:
+    st.write("Recommendation: Bet on **Away Win**")
+else:
+    st.write("Recommendation: Bet on **Draw**")
+
+st.write("### Over/Under Recommendations")
+for key, value in ou_probs.items():
+    st.write(f"Probability of {key}: **{value * 100:.2f}%**")
+st.write(f"Recommendation: Bet on **{'Over' if ou_probs['Over 2.5'] > 0.5 else 'Under'} 2.5 Goals**")
+
+st.write("### GG/NG Recommendations")
+st.write(f"Probability of GG: **{gg_prob:.2%}**")
+st.write(f"Probability of NG: **{ng_prob:.2%}**")
+st.write(f"Recommendation: Bet on **{'GG' if gg_prob > 0.5 else 'NG'}**")
+
+st.write("### Combined Recommendations (Over/Under 2.5 & GG/NG)")
+if ou_probs["Over 2.5"] > 0.5 and gg_prob > 0.5:
+    st.write("Recommendation: Bet on **Over 2.5 & GG**")
+elif ou_probs["Under 2.5"] > 0.5 and ng_prob > 0.5:
+    st.write("Recommendation: Bet on **Under 2.5 & NG**")
+else:
+    st.write("Recommendation: No clear combination bet value.")
