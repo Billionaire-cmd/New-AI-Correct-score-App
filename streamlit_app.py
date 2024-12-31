@@ -165,11 +165,14 @@ def calculate_value_bet_correct_score(scoreline_probs, odds_for_scoreline):
     else:
         return None, None
 
-# Example odds for correct scorelines (should be replaced with actual odds)
-odds_for_scoreline = {
-    "0-0": 7.0, "1-0": 6.5, "0-1": 7.2, "1-1": 5.8,
-    "2-0": 10.0, "0-2": 11.0, "2-1": 8.0, "1-2": 8.5,
-    "3-0": 15.0, "0-3": 17.0, "3-1": 13.0, "1-3": 14.0,
+# Example probabilities for correct scores (Replace with actual calculations)
+scoreline_probs = {
+    "0-0": 0.08, "1-0": 0.12, "0-1": 0.10, "1-1": 0.15,
+    "2-0": 0.06, "0-2": 0.05, "2-1": 0.09, "1-2": 0.07,
+    "3-0": 0.03, "0-3": 0.02, "3-1": 0.04, "1-3": 0.03,
+    "2-2": 0.08, "3-2": 0.02, "2-3": 0.01, "4-0": 0.01,
+    "0-4": 0.01, "4-1": 0.01, "1-4": 0.01, "4-2": 0.01,
+    "2-4": 0.01, "4-3": 0.01, "3-4": 0.01, "4-4": 0.005,
 }
 
 # Initial probabilities for scorelines (adjust as needed)
