@@ -375,7 +375,7 @@ if best_value_scoreline:
 else:
     st.write("No profitable value bets for the given scorelines and odds.")
 
-# Find the best value bet correct score
+# Find the Top 7 most likely scorelines best value bet correct score
 best_value_scoreline, best_value_prob = calculate_value_bet_correct_score(scoreline_probs, odds_for_scoreline)
 
 # Display the best value bet correct score
