@@ -175,6 +175,19 @@ scoreline_probs = {
     "2-4": 0.01, "4-3": 0.01, "3-4": 0.01, "4-4": 0.005,
 }
 
+# Initial probabilities for scorelines (adjust as needed)
+scoreline_probs = {
+    "1:0": 5.28, "2:1": 4.75, "1:1": 4.50, "2:0": 4.10, "0:0": 3.90,
+    "3:1": 3.20, "1:2": 3.10, "0:1": 3.00, "2:2": 2.80, "3:0": 2.50,
+    "0:2": 2.40, "4:1": 2.30
+}
+
+# HT/FT probabilities (adjust as needed)
+ht_ft_probabilities = {
+    "1/1": 40.0, "1/X": 10.0, "1/2": 5.0,
+    "X/1": 20.0, "X/X": 15.0, "X/2": 5.0,
+    "2/1": 5.0, "2/X": 5.0, "2/2": 10.0
+}
 # Streamlit app title and description
 st.title("Value Bet Correct Score & HT/FT Probabilities")
 st.write("Input the odds for scorelines and calculate the best value bet based on probabilities.")
