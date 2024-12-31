@@ -375,15 +375,6 @@ if best_value_scoreline:
 else:
     st.write("No profitable value bets for the given scorelines and odds.")
 
-    # Ensure best_scorelines is a list of tuples with scoreline, probability, and odds
-if scoreline_probabilities and odds_for_scoreline:
-    # Calculate EV for all scorelines
-    scoreline_ev = [
-        (scoreline, prob, odds_for_scoreline[scoreline], prob * odds_for_scoreline[scoreline])
-        for scoreline, prob in scoreline_probabilities.items()
-        if scoreline in odds_for_scoreline  # Ensure the scoreline has odds
-    ]
-    
     # Sort by Expected Value (EV) in descending order
     scoreline_ev = sorted(scoreline_ev, key=lambda x: x[3], reverse=True)
 
