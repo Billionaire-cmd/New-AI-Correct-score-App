@@ -190,7 +190,7 @@ ht_ft_probabilities = {
 }
 # Streamlit app title and description
 st.title("Value Bet Correct Score & HT/FT Probabilities")
-st.write("Input the odds for scorelines and calculate the best value bet based on probabilities.")
+st.write("Input the odds for correct scorelines from 0-0 to 4-4 to calculate the best value bet.")
 
 # Input section for odds
 odds_for_scoreline = {}
