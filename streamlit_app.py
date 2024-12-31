@@ -129,6 +129,127 @@ st.subheader("Recommended Scoreline Bet")
 for scoreline, prob in top_5_scorelines:
     st.write(f"Recommended Bet on Scoreline **{scoreline}** with probability **{prob * 100:.2f}%**")
 
+# Probabilities for most likely scorelines (adjustable to real calculations)
+scoreline_probs = {
+    "0-0": 0.062, "1-0": 0.058, "0-1": 0.057, "1-1": 0.061,
+    "2-0": 0.052, "0-2": 0.053, "2-1": 0.059, "1-2": 0.056,
+}
+
+# HT/FT probabilities (initially zero, calculated below)
+ht_ft_probs = {
+    "1/1": 0.0, "1/X": 0.0, "1/2": 0.0,
+    "X/1": 0.0, "X/X": 0.0, "X/2": 0.0,
+    "2/1": 0.0, "2/X": 0.0, "2/2": 0.0,
+}
+
+# HT/FT odds input
+st.title("HT/FT & Correct Score Value Bet Calculator")
+st.subheader("Input Odds for HT/FT Outcomes")
+odds_for_ht_ft = {}
+for outcome in ht_ft_probs.keys():
+    odds_for_ht_ft[outcome] = st.number_input(
+        f"Odds for {outcome}:", min_value=1.0, value=10.0, step=0.1
+    )
+
+# Function to calculate HT/FT probabilities based on scorelines
+def calculate_ht_ft_probs(scoreline_probs):
+    ht_ft_probs = {
+        "1/1": 0.0, "1/X": 0.0, "1/2": 0.0,
+        "X/1": 0.0, "X/X": 0.0, "X/2": 0.0,
+        "2/1": 0.0, "2/X": 0.0, "2/2": 0.0,
+    }
+    for scoreline, prob in scoreline_probs.items():
+        ht, ft = map(int, scoreline.split("-"))
+
+        if ht > ft:  # HT Win
+            if ft > ht:  # FT Lose
+                ht_ft_probs["1/2"] += prob
+            elif ft == ht:  # FT Draw
+                ht_ft_probs["1/X"] += prob
+            else:  # FT Win
+                ht_ft_probs["1/1"] += prob
+        elif ht == ft:  # HT Draw
+            if ft > ht:  # FT Win
+                ht_ft_probs["X/1"] += prob
+            elif ft == ht:  # FT Draw
+                ht_ft_probs["X/X"] += prob
+            else:  # FT Lose
+                ht_ft_probs["X/2"] += prob
+        else:  # HT Lose
+            if ft > ht:  # FT Win
+                ht_ft_probs["2/1"] += prob
+            elif ft == ht:  # FT Draw
+                ht_ft_probs["2/X"] += prob
+            else:  # FT Lose
+                ht_ft_probs["2/2"] += prob
+
+    return ht_ft_probs
+
+# Calculate HT/FT probabilities
+ht_ft_probs = calculate_ht_ft_probs(scoreline_probs)
+
+# Display HT/FT probabilities
+st.subheader("HT/FT Probabilities")
+for scenario, prob in ht_ft_probs.items():
+    st.write(f"{scenario}: **{prob * 100:.2f}%**")
+
+# Find the best HT/FT value bet
+def find_best_ht_ft_value_bet(ht_ft_probs, odds_for_ht_ft):
+    value_bets = {
+        outcome: prob for outcome, prob in ht_ft_probs.items()
+        if outcome in odds_for_ht_ft and prob * odds_for_ht_ft[outcome] > 1
+    }
+    if value_bets:
+        best_outcome = max(value_bets, key=value_bets.get)
+        return best_outcome, value_bets[best_outcome]
+    return None, None
+
+# Best HT/FT value bet
+best_ht_ft_outcome, best_ht_ft_prob = find_best_ht_ft_value_bet(ht_ft_probs, odds_for_ht_ft)
+
+# Display the best HT/FT value bet
+if best_ht_ft_outcome:
+    st.subheader("Best HT/FT Value Bet")
+    st.write(f"The best HT/FT value bet is: **{best_ht_ft_outcome}**")
+    st.write(f"Probability: **{best_ht_ft_prob * 100:.2f}%**")
+    st.write(f"Odds: **{odds_for_ht_ft[best_ht_ft_outcome]}**")
+    st.write(f"Expected Value (EV): **{best_ht_ft_prob * odds_for_ht_ft[best_ht_ft_outcome]:.2f}**")
+else:
+    st.subheader("Best HT/FT Value Bet")
+    st.write("No profitable HT/FT value bets found based on the given odds and probabilities.")
+
+# Function to calculate the best value bet for correct scores
+def calculate_best_correct_score(scoreline_probs, threshold=0.052):
+    """Filters scorelines with probabilities above the threshold."""
+    filtered_scores = {
+        scoreline: prob for scoreline, prob in scoreline_probs.items() if prob >= threshold
+    }
+    if filtered_scores:
+        best_scoreline = max(filtered_scores, key=filtered_scores.get)
+        return best_scoreline, filtered_scores[best_scoreline]
+    return None, None
+
+# Calculate the best correct score
+best_scoreline, best_score_prob = calculate_best_correct_score(scoreline_probs, threshold=0.052)
+
+# Display the best correct score
+if best_scoreline:
+    st.subheader("Best Correct Score")
+    st.write(f"The most likely correct score: **{best_scoreline}**")
+    st.write(f"Probability: **{best_score_prob * 100:.2f}%**")
+else:
+    st.subheader("Best Correct Score")
+    st.write("No scoreline exceeds the probability threshold.")
+
+# Final recommendation based on the highest value bet
+if best_ht_ft_outcome and best_scoreline:
+    st.subheader("Final Recommendation")
+    st.write(f"Recommended HT/FT Outcome: **{best_ht_ft_outcome}**")
+    st.write(f"Recommended Correct Score: **{best_scoreline}**")
+else:
+    st.subheader("Final Recommendation")
+    st.write("Not enough data for a confident recommendation.")
+
 # Value odds calculation
 def calculate_value(probability, odds):
     return probability * odds > 1
