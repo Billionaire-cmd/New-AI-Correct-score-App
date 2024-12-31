@@ -172,54 +172,82 @@ odds_for_scoreline = {
     "3-0": 15.0, "0-3": 17.0, "3-1": 13.0, "1-3": 14.0,
 }
 
-# Function to calculate HT/FT probabilities
-def calculate_ht_ft_probs(scoreline_probs):
-    ht_ft_probs = {
-        "HT Win / FT Win": 0.0,
-        "HT Win / FT Draw": 0.0,
-        "HT Win / FT Lose": 0.0,
-        "HT Draw / FT Win": 0.0,
-        "HT Draw / FT Draw": 0.0,
-        "HT Draw / FT Lose": 0.0,
-        "HT Lose / FT Win": 0.0,
-        "HT Lose / FT Draw": 0.0,
-        "HT Lose / FT Lose": 0.0,
+# Initial probabilities for scorelines (adjust as needed)
+scoreline_probs = {
+    "1:0": 5.28, "2:1": 4.75, "1:1": 4.50, "2:0": 4.10, "0:0": 3.90,
+    "3:1": 3.20, "1:2": 3.10, "0:1": 3.00, "2:2": 2.80, "3:0": 2.50,
+    "0:2": 2.40, "4:1": 2.30
+}
+
+# HT/FT probabilities (adjust as needed)
+ht_ft_probabilities = {
+    "1/1": 40.0, "1/X": 10.0, "1/2": 5.0,
+    "X/1": 20.0, "X/X": 15.0, "X/2": 5.0,
+    "2/1": 5.0, "2/X": 5.0, "2/2": 10.0
+}
+
+# Streamlit app title and description
+st.title("Value Bet Correct Score & HT/FT Probabilities")
+st.write("Input the odds for scorelines and calculate the best value bet based on probabilities.")
+
+# Input section for odds
+odds_for_scoreline = {}
+for scoreline in scoreline_probs.keys():
+    odds_for_scoreline[scoreline] = st.number_input(
+        f"Odds for {scoreline}:", min_value=1.0, value=10.0, step=0.1
+    )
+
+# Step 1: Adjust probabilities using a scaling factor
+scaling_factor = 6.19 / 5.28  # Example adjustment
+adjusted_scorelines = {
+    score: round(prob * scaling_factor, 2) for score, prob in scoreline_probs.items()
+}
+
+# Step 2: Normalize adjusted probabilities to sum to 100%
+total_prob = sum(adjusted_scorelines.values())
+adjusted_scorelines = {
+    score: round(prob / total_prob * 100, 2) for score, prob in adjusted_scorelines.items()
+}
+
+# Step 3: Combine HT/FT probabilities with adjusted scoreline probabilities
+combined_probabilities = {}
+for score, score_prob in adjusted_scorelines.items():
+    ht_key = "1/1" if score in ["1:0", "2:0", "3:1"] else "X/X"  # Example mapping
+    ht_prob = ht_ft_probabilities.get(ht_key, 0)
+    combined_probabilities[score] = round(score_prob * (ht_prob / 100), 2)
+
+# Step 4: Calculate value bets for correct scores
+def calculate_value_bet_correct_score(scoreline_probs, odds_for_scoreline):
+    value_bets = {
+        scoreline: prob for scoreline, prob in scoreline_probs.items()
+        if scoreline in odds_for_scoreline and prob * odds_for_scoreline[scoreline] > 1
     }
+    if value_bets:
+        best_value_scoreline = max(value_bets, key=value_bets.get)
+        return best_value_scoreline, value_bets[best_value_scoreline]
+    return None, None
 
-    for scoreline, prob in scoreline_probs.items():
-        ht, ft = map(int, scoreline.split("-"))
+# Find the best value bet correct score
+best_value_scoreline, best_value_prob = calculate_value_bet_correct_score(
+    adjusted_scorelines, odds_for_scoreline
+)
 
-        if ht > ft:  # HT Win
-            if ft > ht:  # FT Lose
-                ht_ft_probs["HT Win / FT Lose"] += prob
-            elif ft == ht:  # FT Draw
-                ht_ft_probs["HT Win / FT Draw"] += prob
-            else:  # FT Win
-                ht_ft_probs["HT Win / FT Win"] += prob
-        elif ht == ft:  # HT Draw
-            if ft > ht:  # FT Win
-                ht_ft_probs["HT Draw / FT Win"] += prob
-            elif ft == ht:  # FT Draw
-                ht_ft_probs["HT Draw / FT Draw"] += prob
-            else:  # FT Lose
-                ht_ft_probs["HT Draw / FT Lose"] += prob
-        else:  # HT Lose
-            if ft > ht:  # FT Win
-                ht_ft_probs["HT Lose / FT Win"] += prob
-            elif ft == ht:  # FT Draw
-                ht_ft_probs["HT Lose / FT Draw"] += prob
-            else:  # FT Lose
-                ht_ft_probs["HT Lose / FT Lose"] += prob
+# Step 5: Display results
+st.subheader("Adjusted Scoreline Probabilities")
+st.write(adjusted_scorelines)
 
-    return ht_ft_probs
+st.subheader("Combined Probabilities")
+st.write(combined_probabilities)
 
-# Calculate HT/FT probabilities
-ht_ft_probs = calculate_ht_ft_probs(scoreline_probs)
+st.subheader("Value Bet Correct Score")
+if best_value_scoreline:
+    st.write(f"**Best Value Bet Correct Score:** {best_value_scoreline}")
+    st.write(f"**Probability:** {best_value_prob:.2f}%")
+    st.write(f"**Odds:** {odds_for_scoreline[best_value_scoreline]}")
+    st.write(f"**Expected Value (EV):** {best_value_prob * odds_for_scoreline[best_value_scoreline]:.2f}")
+else:
+    st.write("No profitable value bets for the given scorelines and odds.")
 
-# Display HT/FT probabilities
-st.subheader("HT/FT Probabilities")
-for scenario, prob in ht_ft_probs.items():
-    st.write(f"{scenario}: **{prob * 100:.2f}%**")
 # Find the best value bet correct score
 best_value_scoreline, best_value_prob = calculate_value_bet_correct_score(scoreline_probs, odds_for_scoreline)
 
