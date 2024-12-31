@@ -172,6 +172,54 @@ odds_for_scoreline = {
     "3-0": 15.0, "0-3": 17.0, "3-1": 13.0, "1-3": 14.0,
 }
 
+# Function to calculate HT/FT probabilities
+def calculate_ht_ft_probs(scoreline_probs):
+    ht_ft_probs = {
+        "HT Win / FT Win": 0.0,
+        "HT Win / FT Draw": 0.0,
+        "HT Win / FT Lose": 0.0,
+        "HT Draw / FT Win": 0.0,
+        "HT Draw / FT Draw": 0.0,
+        "HT Draw / FT Lose": 0.0,
+        "HT Lose / FT Win": 0.0,
+        "HT Lose / FT Draw": 0.0,
+        "HT Lose / FT Lose": 0.0,
+    }
+
+    for scoreline, prob in scoreline_probs.items():
+        ht, ft = map(int, scoreline.split("-"))
+
+        if ht > ft:  # HT Win
+            if ft > ht:  # FT Lose
+                ht_ft_probs["HT Win / FT Lose"] += prob
+            elif ft == ht:  # FT Draw
+                ht_ft_probs["HT Win / FT Draw"] += prob
+            else:  # FT Win
+                ht_ft_probs["HT Win / FT Win"] += prob
+        elif ht == ft:  # HT Draw
+            if ft > ht:  # FT Win
+                ht_ft_probs["HT Draw / FT Win"] += prob
+            elif ft == ht:  # FT Draw
+                ht_ft_probs["HT Draw / FT Draw"] += prob
+            else:  # FT Lose
+                ht_ft_probs["HT Draw / FT Lose"] += prob
+        else:  # HT Lose
+            if ft > ht:  # FT Win
+                ht_ft_probs["HT Lose / FT Win"] += prob
+            elif ft == ht:  # FT Draw
+                ht_ft_probs["HT Lose / FT Draw"] += prob
+            else:  # FT Lose
+                ht_ft_probs["HT Lose / FT Lose"] += prob
+
+    return ht_ft_probs
+
+# Calculate HT/FT probabilities
+ht_ft_probs = calculate_ht_ft_probs(scoreline_probs)
+
+# Display HT/FT probabilities
+st.subheader("HT/FT Probabilities")
+for scenario, prob in ht_ft_probs.items():
+    st.write(f"{scenario}: **{prob * 100:.2f}%**")
 # Find the best value bet correct score
 best_value_scoreline, best_value_prob = calculate_value_bet_correct_score(scoreline_probs, odds_for_scoreline)
 
