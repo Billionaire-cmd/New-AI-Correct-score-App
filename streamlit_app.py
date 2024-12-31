@@ -368,7 +368,7 @@ st.write(combined_probabilities)
 
 st.subheader("Value Bet Correct Score")
 if best_value_scoreline:
-    st.write(f"**Best Value Bet Correct Score:** {best_value_scoreline}")
+    st.write(f"**Top 7 most likely Best Value Bet Correct Score:** {best_value_scoreline}")
     st.write(f"**Probability:** {best_value_prob:.2f}%")
     st.write(f"**Odds:** {odds_for_scoreline[best_value_scoreline]}")
     st.write(f"**Expected Value (EV):** {best_value_prob * odds_for_scoreline[best_value_scoreline]:.2f}")
