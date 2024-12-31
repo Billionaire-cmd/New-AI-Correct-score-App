@@ -366,14 +366,34 @@ st.write(adjusted_scorelines)
 st.subheader("Combined Probabilities")
 st.write(combined_probabilities)
 
-st.subheader("Value Bet Correct Score")
-if best_value_scoreline:
-    st.write(f"**Top 7 most likely Best Value Bet Correct Score:** {best_value_scoreline}")
-    st.write(f"**Probability:** {best_value_prob:.2f}%")
-    st.write(f"**Odds:** {odds_for_scoreline[best_value_scoreline]}")
-    st.write(f"**Expected Value (EV):** {best_value_prob * odds_for_scoreline[best_value_scoreline]:.2f}")
+st.subheader("Top 7 Value Bet Correct Scorelines")
+
+# Ensure best_scorelines is a list of tuples with scoreline, probability, and odds
+if scoreline_probabilities and odds_for_scoreline:
+    # Calculate EV for all scorelines
+    scoreline_ev = [
+        (scoreline, prob, odds_for_scoreline[scoreline], prob * odds_for_scoreline[scoreline])
+        for scoreline, prob in scoreline_probabilities.items()
+        if scoreline in odds_for_scoreline  # Ensure the scoreline has odds
+    ]
+
+    # Sort by Expected Value (EV) in descending order
+    scoreline_ev = sorted(scoreline_ev, key=lambda x: x[3], reverse=True)
+
+    # Select the top 7 scorelines
+    top_7_scorelines = scoreline_ev[:7]
+
+    # Display the results
+    for i, (scoreline, prob, odds, ev) in enumerate(top_7_scorelines, start=1):
+        st.write(f"**#{i} Scoreline:** {scoreline}")
+        st.write(f"   - **Probability:** {prob * 100:.2f}%")
+        st.write(f"   - **Odds:** {odds}")
+        st.write(f"   - **Expected Value (EV):** {ev:.2f}")
+        st.write("---")  # Add a separator between scorelines
+
 else:
-    st.write("No profitable value bets for the given scorelines and odds.")
+    st.write("No data available for scorelines or odds.")
+
 
 # Find the Top 7 most likely scorelines best value bet correct score
 best_value_scoreline, best_value_prob = calculate_value_bet_correct_score(scoreline_probs, odds_for_scoreline)
